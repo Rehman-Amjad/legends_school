@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:legends_schools_admin/helper/my_color.dart';
 import 'package:legends_schools_admin/main/admission_form_screen.dart';
+import 'package:legends_schools_admin/notifications_screen/notifications_screen.dart';
+import 'package:legends_schools_admin/search_students/search_students.dart';
 
 import '../helper/container_helper.dart';
 import '../helper/image_path.dart';
@@ -23,48 +24,64 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
-            SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                    flex: 1,
-                    child: Text("")),
+                const Expanded(flex: 1, child: Text("")),
                 Expanded(
                     flex: 2,
                     child: InkWell(
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>StudentAdmissionFormScreen()));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const StudentAdmissionFormScreen()));
                       },
-                      child: ContainerHelper().dashContainerMenu(20, MediaQuery.sizeOf(context).width,
-                          100, ImagePath().studentImagePath, "Admission Form"),
-                    )
-                ),
+                      child: ContainerHelper().dashContainerMenu(
+                          20,
+                          MediaQuery.sizeOf(context).width,
+                          100,
+                          ImagePath().studentImagePath,
+                          "Admission Form"),
+                    )),
                 Expanded(
                     flex: 2,
                     child: InkWell(
-                      onTap: (){
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>VehicleRegistrationScreen()));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SearchStudents()));
                       },
-                      child: ContainerHelper().dashContainerMenu(20, MediaQuery.sizeOf(context).width,
-                          100, ImagePath().adminImagePath, "admin"),
-                    )
-                ),
+                      child: ContainerHelper().dashContainerMenu(
+                          20,
+                          MediaQuery.sizeOf(context).width,
+                          100,
+                          ImagePath().adminImagePath,
+                          "Search Student"),
+                    )),
                 Expanded(
                     flex: 2,
                     child: InkWell(
-                      onTap: (){
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>HudaiRegistrationScreen()));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => NotificationsScreen()));
                       },
-                      child: ContainerHelper().dashContainerMenu(20, MediaQuery.sizeOf(context).width,
-                          100, ImagePath().adminImagePath, "admin"),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text("")),
+                      child: ContainerHelper().dashContainerMenu(
+                          20,
+                          MediaQuery.sizeOf(context).width,
+                          100,
+                          ImagePath().chat,
+                          "Chat"),
+                    )),
+                const Expanded(flex: 1, child: Text("")),
               ],
             ),
           ],
