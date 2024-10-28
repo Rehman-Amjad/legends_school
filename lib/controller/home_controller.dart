@@ -2,8 +2,7 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
-
-import '../helper/my_toast.dart';
+import '../utils/web_utils.dart';
 
 class HomeController extends GetxController {
   Uint8List? pickedImage;
@@ -19,7 +18,7 @@ class HomeController extends GetxController {
     FilePickerResult? pickImage =
         await FilePicker.platform.pickFiles(type: FileType.image);
     if (pickImage == null) {
-      return MyToast().errorToast("Please select a image");
+      return WebUtils().errorToast("Please select a image");
     } else {
       pickedImage = pickImage.files.first.bytes!;
       update();

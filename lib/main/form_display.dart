@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:legends_schools_admin/main/home_screen.dart';
-import 'package:legends_schools_admin/start/dashboard_screen.dart';
+import 'package:legends_schools_admin/screens/drawer/drawer_screen.dart';
 
 class FormDisplayScreen extends StatelessWidget {
 
@@ -65,7 +64,7 @@ class FormDisplayScreen extends StatelessWidget {
                           margin: EdgeInsets.all(10.0),
                           child: InkWell(
                             onTap: () {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashBoardScreen(),));
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DrawerScreen(),));
                             },
                             child: Text("Back to Home",style: TextStyle(
                               color: Colors.red,

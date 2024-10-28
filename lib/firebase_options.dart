@@ -53,12 +53,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAEfonV3RXYMu5LHiDBwTgSas-8n1mFQYg',
-    appId: '1:115412818940:web:60982ede0b8787137cf079',
-    messagingSenderId: '115412818940',
-    projectId: 'legends-school',
-    authDomain: 'legends-school.firebaseapp.com',
-    storageBucket: 'legends-school.appspot.com',
-    measurementId: 'G-FBM5PCFHNL',
+    apiKey: 'AIzaSyCOpCfeXI2ldL0Zwgyc69CmVokiC8h0ibU',
+    appId: '1:152427349545:web:70c57d6aeceb3d27d8fe38',
+    messagingSenderId: '152427349545',
+    projectId: 'legends-school-system',
+    authDomain: 'legends-school-system.firebaseapp.com',
+    storageBucket: 'legends-school-system.appspot.com',
+    measurementId: 'G-2Z1LC8E65M',
   );
+
 }

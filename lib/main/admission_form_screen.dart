@@ -9,15 +9,15 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:legends_schools_admin/config/component/app_text_field.dart';
 import 'package:legends_schools_admin/controller/image_controller.dart';
-import 'package:legends_schools_admin/helper/button_widget.dart';
-import 'package:legends_schools_admin/helper/image_path.dart';
-import 'package:legends_schools_admin/helper/my_color.dart';
-import 'package:legends_schools_admin/helper/my_toast.dart';
-import 'package:legends_schools_admin/helper/text_helper.dart';
+import 'package:legends_schools_admin/config/component/button_widget.dart';
 import 'package:legends_schools_admin/main/form_display.dart';
 
-import '../helper/my_input_field.dart';
+import '../config/res/app_assets.dart';
+import '../config/color/my_color.dart';
+import '../config/component/my_input_field.dart';
+import '../utils/web_utils.dart';
 
 class StudentAdmissionFormScreen extends StatefulWidget {
   const StudentAdmissionFormScreen({Key? key}) : super(key: key);
@@ -122,8 +122,8 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
         builder: (controller){
           return Scaffold(
             appBar: AppBar(
-              title: Text("Student Admission Form",style: TextStyle(color: MyColor().whiteColor),),
-              backgroundColor: MyColor().mainColor,
+              title: Text("Student Admission Form",style: TextStyle(color: AppColor().whiteColor),),
+              backgroundColor: AppColor().mainColor,
             ),
             body: SingleChildScrollView(
               child: Column(
@@ -142,7 +142,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                             decoration: BoxDecoration(
                               border: Border.all(
                                   width: 1,
-                                  color: MyColor().mainColor
+                                  color: AppColor().mainColor
                               ),
 
                             ),
@@ -181,7 +181,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                           child: Column(
                             children: [
                               Container(
-                                child: Image.asset(ImagePath().logoImagePath,width: 150,height: 150,),
+                                child: Image.asset(AppAssets().logoImagePath,width: 150,height: 150,),
                               ),
                               Container(
                                 margin: EdgeInsets.only(top: 20,bottom: 10),
@@ -221,14 +221,14 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                                   },
                                   icon:  Icon(
                                     Icons.arrow_drop_down_circle,
-                                    color: MyColor().mainColor,
+                                    color: AppColor().mainColor,
                                   ),
                                   dropdownColor: Colors.amber.shade50,
                                   decoration:  InputDecoration(
                                       labelText: "Student Class",
                                       prefixIcon: Icon(
                                         Icons.class_sharp,
-                                        color: MyColor().mainColor,
+                                        color: AppColor().mainColor,
                                       )),
                                 ),
                               ),
@@ -289,8 +289,9 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                                 width: 500,
                                 height: 50,
                                 margin: EdgeInsets.only(left: 50,right: 10),
-                                child: MyCustomInputField(
-                                    "Name".toUpperCase(),"Name".toUpperCase(),nameController
+                                child: AppTextField(
+                                    hintText: "Name".toUpperCase(),
+                                    controller : nameController
                                 ),
                               ),),
                             Expanded(
@@ -614,14 +615,14 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                                   },
                                   icon:  Icon(
                                     Icons.arrow_drop_down_circle,
-                                    color: MyColor().mainColor,
+                                    color: AppColor().mainColor,
                                   ),
                                   dropdownColor: Colors.amber.shade50,
                                   decoration:  InputDecoration(
                                       labelText: "Student Gender",
                                       prefixIcon: Icon(
                                         Icons.class_sharp,
-                                        color: MyColor().mainColor,
+                                        color: AppColor().mainColor,
                                       )),
                                 ),
                               ),
@@ -668,7 +669,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
                                   accountStatus = "Please Filed Missing Fields";
                                   topColor = Colors.red;
                                 });
-                                MyToast().errorToast("Please Filed Missing Fields");
+                                WebUtils().errorToast("Please Filed Missing Fields");
                               }else{
                                 EasyLoading.show(status: "please wait");
                                 String imageURL = await  controller.firebaseStorageImage(image: controller.pickedImage!);
@@ -738,7 +739,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
         setState(() {
           imgUrl = downloadUrl;
           pictureStatus = "Student Picture uploaded successfully";
-          MyToast().errorToast("Picture uploaded");
+          WebUtils().errorToast("Picture uploaded");
           closeWaitingDialog(context);
         });
       });
@@ -817,7 +818,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
     }).whenComplete(() {
       // updateFormID();
       EasyLoading.dismiss();
-     MyToast().errorToast("Student Register successfully");
+      WebUtils().errorToast("Student Register successfully");
     });
   }
 
@@ -828,7 +829,7 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
         .whenComplete(() {
       _checkParentAccountExits(formID.toString());
     }).onError((error, stackTrace) {
-      MyToast().errorToast("Something went wrong! try again");
+      WebUtils().errorToast("Something went wrong! try again");
 
     });
   }
@@ -858,10 +859,10 @@ class _StudentAdmissionFormScreenState extends State<StudentAdmissionFormScreen>
     }).whenComplete(
           () {
         moveToDetailsPage();
-        MyToast().errorToast("Parent Account Created");
+        WebUtils().errorToast("Parent Account Created");
       },
     ).onError((error, stackTrace) {
-     MyToast().errorToast("Something went wrong! try again");
+      WebUtils().errorToast("Something went wrong! try again");
     });
   }
 
