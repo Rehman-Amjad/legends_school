@@ -17,7 +17,6 @@ class AdmissionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<MenuProvider>(context);
     return Scaffold(
         body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(
@@ -34,29 +33,10 @@ class AdmissionScreen extends StatelessWidget {
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: Responsive.isMobile(context) ? 14.0 : 18.0),
-                    // CustomNeumorphicButton(
-                    //   width: Responsive.isMobile(context) ? 150 : 200,
-                    //   height: 50,
-                    //   isIcon: false,
-                    //   label: 'Add New',
-                    //   press: () {
-                    //     provider.parameters?.clear();
-                    //     provider.changeScreen(Routes.ADD_CATEGORY_ROUTE);
-                    //   },
-                    // ),
-                    ButtonWidget(
-                        text: "Add New",
-                        width: 120,
-                        height: 50,
-                        backgroundColor: primaryColor,
-                        onClicked: (){
-                        provider.selectIndex(14);
-                        }
-                    )
                   ],
                 ),
                 SizedBox(height: 2.w,),
-                StudentAdmissionListWidget(),
+                const StudentAdmissionListWidget(),
               ]
           ),
         )

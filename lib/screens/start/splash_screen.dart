@@ -42,7 +42,7 @@ class _StartScreenState extends State<StartScreen> {
             borderRadius: BorderRadius.all(Radius.circular(21)),
           ),
           duration: const Duration(seconds: 4),
-          child: Image.asset(AppAssets().logoImagePath),
+          child: Image.asset(AppAssets.logo),
         ),
       ),
     ));

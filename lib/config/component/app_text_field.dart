@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../constant.dart';
+import '../../../../constant.dart';
+import 'app_text_widget.dart';
 
 class AppTextField extends StatelessWidget {
   final String hintText;
+  final String? labelText;
+  final Color? labelTextColor;
+  final double? labelTextSize;
+  final FontWeight? labelFontWeight;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final void Function(String)? onFieldSubmitted;
-  final void Function(String)? onChanged;
   final FocusNode? focusNode;
   final bool borderSides;
   final double? radius;
-  final VoidCallback? press;
-  // final int? maxLine;
-  // final int? maxLength;
+  final int? maxLine;
+  final int? maxLength;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
-  final bool obscureText,readOnly;
-  final Color? fillColor, borderColor, borderSideColor, focusBorderColor;
+  final bool obscureText;
   const AppTextField({
     super.key,
     required this.hintText,
@@ -28,72 +30,80 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.borderSides = false,
     this.onFieldSubmitted,
-    this.onChanged,
     this.focusNode,
     this.radius,
     this.obscureText = false,
-    this.readOnly = false,
     this.keyboardType,
     this.inputFormatters,
-    this.fillColor,
-    this.borderColor,
-    this.borderSideColor,
-    this.focusBorderColor,
     this.suffixIcon,
-    this.press,
-    // this.maxLine,
+    this.maxLine,
     this.prefixIcon,
-    // this.maxLength,
+    this.maxLength,
+    this.labelText,
+    this.labelTextSize,
+    this.labelFontWeight,
+    this.labelTextColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      readOnly: readOnly,
-      onChanged: onChanged,
-      onTap: press,
-      // maxLines: maxLine,
-      style: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.w500
-      ),
-      inputFormatters: inputFormatters,
-      keyboardType: keyboardType,
-      controller: controller,
-      validator: validator,
-      focusNode: focusNode,
-      onFieldSubmitted: onFieldSubmitted,
-      cursorColor: Colors.black,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        prefixIcon: prefixIcon,
-        suffixIcon: suffixIcon,
-        hintText: hintText,
-        filled: true,
-        border: OutlineInputBorder(
-          borderSide:  BorderSide(color: borderSideColor ?? darkGrey, width: 2),
-          borderRadius: BorderRadius.circular(radius ?? 5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if(labelText !=null)...[
+          AppTextWidget(
+            text: labelText ?? "",
+            fontSize: labelTextSize ?? 16,
+            color: labelTextColor ?? Colors.black,
+            fontWeight: labelFontWeight ?? FontWeight.bold,
+          ),
+          SizedBox(height: 10,),
+        ],
+        TextFormField(
+          maxLines: maxLine ?? 1,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w500
+          ),
+          inputFormatters: inputFormatters,
+          keyboardType: keyboardType,
+          controller: controller,
+          validator: validator,
+          focusNode: focusNode,
+          onFieldSubmitted: onFieldSubmitted,
+          cursorColor: Colors.black,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            prefixIcon: prefixIcon,
+            suffixIcon: suffixIcon,
+            hintText: hintText,
+            filled: true,
+            border: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.grey, width: 2),
+              borderRadius: BorderRadius.circular(radius ?? 5),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              borderSide: const BorderSide(color: Colors.black),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              borderSide: const BorderSide(color: Colors.black),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              borderSide:  BorderSide(color: Colors.red),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(radius ?? 5),
+              borderSide:  BorderSide(color: Colors.grey),
+            ),
+            fillColor: Colors.white,
+            focusColor: Colors.blueGrey,
+            hintStyle: const TextStyle(fontSize: 12.0, color: Colors.grey),
+          ),
         ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius ?? 5),
-          borderSide: const BorderSide(color: Colors.black),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius ?? 5),
-          borderSide:  BorderSide(color: focusBorderColor ?? primaryColor),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius ?? 5),
-          borderSide:  const BorderSide(color: primaryColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius ?? 5),
-          borderSide:  BorderSide(color: borderColor ?? Colors.grey.shade200),
-        ),
-        fillColor: fillColor ?? customGrey,
-        focusColor: Colors.blueGrey,
-        hintStyle: const TextStyle(fontSize: 12.0, color: Colors.grey,fontWeight: FontWeight.w500),
-      ),
+      ],
     );
   }
 }

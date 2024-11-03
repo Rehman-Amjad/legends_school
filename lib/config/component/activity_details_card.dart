@@ -17,11 +17,11 @@ class ActivityDetailsCard extends StatelessWidget {
     HealthModel(
         icon: 'assets/svg/steps.svg',
         value: "10,983",
-        title: "Steps"
+        title: "Expense"
     ),
     HealthModel(
-        icon: 'assets/svg/distance.svg', value: "7km", title: "Distance"),
-    HealthModel(icon: 'assets/svg/sleep.svg', value: "7h48m", title: "Sleep"),
+        icon: 'assets/svg/distance.svg', value: "6k", title: "Fees"),
+    HealthModel(icon: 'assets/svg/sleep.svg', value: "12", title: "Presents"),
   ];
 
   @override
@@ -40,7 +40,7 @@ class ActivityDetailsCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SvgPicture.asset(healthDetails[i].icon),
+            //  SvgPicture.asset(healthDetails[i].icon),
               Padding(
                 padding: const EdgeInsets.only(top: 15, bottom: 4),
                 child: Text(

@@ -8,7 +8,12 @@ class TextFieldHeadBox extends StatelessWidget {
   final String labelText,hintText;
   final TextEditingController controller;
   final VoidCallback? press;
-  TextFieldHeadBox({super.key, required this.labelText, required this.hintText, required this.controller, this.press});
+  TextInputType? textInputType;
+  TextFieldHeadBox({super.key,
+    required this.labelText, required this.hintText,
+    required this.controller, this.press,
+     this.textInputType
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,11 @@ class TextFieldHeadBox extends StatelessWidget {
         children: [
           AppTextWidget(text: labelText, color: Colors.black, fontSize: 16.0),
           SizedBox(height: 10.0),
-          AppTextField(press: press,hintText: hintText, controller: controller)
+          AppTextField(
+              hintText: hintText,
+              controller: controller,
+            keyboardType: textInputType,
+          )
         ],
       ),
     );

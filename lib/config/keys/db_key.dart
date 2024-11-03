@@ -1,4 +1,5 @@
 class DbKey{
 
-  static const admissions = "admissions";
+  static const admissions = "students";
+  static const teachers = "teachers";
 }

@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                           width:fullWidth,
                           height: fullHeight,
-                          child: Image.asset(AppAssets().loginSideImagePath,fit: BoxFit.fill,opacity: const AlwaysStoppedAnimation(.5),)),
+                          child: Image.asset(AppAssets.loginSideImagePath,fit: BoxFit.fill,opacity: const AlwaysStoppedAnimation(.5),)),
 
                       Center(
                         child: Text("Legend Schools and Colleges",style: TextStyle(color: AppColor().whiteColor,fontSize: 30,fontWeight: FontWeight.bold),
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                      SizedBox(
                       width: 200,
                       height: 200,
-                      child: Image.asset(AppAssets().logoImagePath,fit: BoxFit.fill,),
+                      child: Image.asset(AppAssets.logo,fit: BoxFit.fill,),
                     ),
 
 
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     ButtonWidget(
                         width: 200,
-                        text: "Login Now", onClicked: (){
+                        text: "Login Now", onClicked: () async{
                       log("${username!}controller: ${usernameController.text}");
                       if(username == usernameController.text.toString().toLowerCase())
                       {

@@ -5,13 +5,17 @@ import 'package:get/get.dart';
 import 'package:legends_schools_admin/provider/constant/action_provider.dart';
 import 'package:legends_schools_admin/provider/constant/drop_down_provider.dart';
 import 'package:legends_schools_admin/provider/constant/picker_provider.dart';
+import 'package:legends_schools_admin/provider/constant/result_provider.dart';
 import 'package:legends_schools_admin/provider/global/global_access_provider.dart';
 import 'package:legends_schools_admin/provider/menu/menu_provider.dart';
 import 'package:legends_schools_admin/provider/registration/form_id_provider.dart';
 import 'package:legends_schools_admin/provider/registration/registration_provider.dart';
+import 'package:legends_schools_admin/provider/registration/teacher_registration_provider.dart';
 import 'package:legends_schools_admin/provider/stream/stream_data_provider.dart';
+import 'package:legends_schools_admin/provider/studentCard/student_card_provider.dart';
 import 'package:legends_schools_admin/routes/routes.dart';
 import 'package:legends_schools_admin/routes/routes_name.dart';
+import 'package:legends_schools_admin/screens/cards/student_card_serach.dart';
 import 'package:legends_schools_admin/screens/dashboard/dashboard.dart';
 import 'package:legends_schools_admin/screens/drawer/drawer_screen.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +45,9 @@ class MyApp extends StatelessWidget {
            ChangeNotifierProvider(create: (_) => FormIdProvider()),
            ChangeNotifierProvider(create: (_) => RegistrationProvider()),
            ChangeNotifierProvider(create: (_) => PickerProvider()),
+           ChangeNotifierProvider(create: (_) => ResultProvider()),
+           ChangeNotifierProvider(create: (_) => TeacherRegistrationProvider()),
+           ChangeNotifierProvider(create: (_) => StudentCardProvider()),
         ],
         child: GetMaterialApp(
           title: 'Legend School System',

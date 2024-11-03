@@ -29,7 +29,7 @@ class HomeProfileWidget extends StatelessWidget {
                 height:   50,
               ),
               Image.asset(
-                AppAssets().logoImagePath,
+                AppAssets.logo,
                 width: 150.0,
                 height: 150.0,
               ),
@@ -44,7 +44,7 @@ class HomeProfileWidget extends StatelessWidget {
                 height: 2,
               ),
              const Text(
-                "Edit health details",
+                "Director",
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.black,
