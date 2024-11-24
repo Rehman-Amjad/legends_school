@@ -28,13 +28,13 @@ class PdfCardFrontWidget extends pw.StatelessWidget {
   var pdfInnerCardHeight = 200.0;
   var pdfCardWidth = 128.0;
 
-  var academyAddress = "Ali Housing Colony";
-  var academyWeb = "@aleezayacademy";
-  var academyWhatsapp = "+92 301 2650333";
-  var academyFacebook = "@aleezayacademy";
-  var academyEmail = "aleezayacademy@gmail.com";
-  var academyTitle = "Aleezay";
-  var academySubTitle = "Group of Academies";
+  var academyAddress = "";
+  var academyWeb = "@";
+  var academyWhatsapp = "+92";
+  var academyFacebook = "@";
+  var academyEmail = "@gmail.com";
+  var academyTitle = "";
+  var academySubTitle = "";
   var academySession = "2024-25";
 
   String amberColor = "#FFBF00",

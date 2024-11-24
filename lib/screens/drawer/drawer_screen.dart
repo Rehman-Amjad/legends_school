@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:legends_schools_admin/constant.dart';
 import 'package:provider/provider.dart';
 
 import '../../config/component/menu.dart';
@@ -14,6 +15,7 @@ class DrawerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: background,
       drawer: _buildDrawer(context),
       body: SafeArea(
         child: Row(

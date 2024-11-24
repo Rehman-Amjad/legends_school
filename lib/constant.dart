@@ -19,6 +19,7 @@ const lightGrey = Color(0xFFE2E8F0);
 const midLightGrey = Color(0xFFF7F8F8);
 const darkPurple = Color(0xFF171433);
 const darkGrey = Color(0x89534F5D);
+const background = Color(0xFFE2E8F0);
 const lightBlue = Colors.lightBlue;
 const Color customGrey = Color(0xFFFBFAF8);
 

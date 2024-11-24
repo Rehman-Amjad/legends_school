@@ -1,8 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:legends_schools_admin/config/keys/db_key.dart';
-import 'package:legends_schools_admin/config/util/app_utils.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:legends_schools_admin/Model/menu_modal.dart';
+import 'package:legends_schools_admin/config/enum/form_type.dart';
+import 'package:legends_schools_admin/config/res/app_string.dart';
+import 'package:legends_schools_admin/provider/constant/picker_provider.dart';
+import 'package:legends_schools_admin/provider/menu/menu_provider.dart';
+import 'package:legends_schools_admin/routes/routes_name.dart';
 import 'package:provider/provider.dart';
 
 import '../../../config/component/app_text_widget.dart';
@@ -13,7 +19,9 @@ import '../../../provider/stream/stream_data_provider.dart';
 import '../../../responsive.dart';
 
 class StudentAdmissionListWidget extends StatelessWidget {
-  const StudentAdmissionListWidget({super.key});
+  final UIType type;
+  String? status;
+   StudentAdmissionListWidget({super.key,this.type = UIType.List,this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +34,7 @@ class StudentAdmissionListWidget extends StatelessWidget {
         _SearchField(),
        const SizedBox(height: 10.0,),
         StreamBuilder<List<RegistrationFormModel>>(
-          stream: provider.getAdmissions(),
+          stream: provider.getAdmissions(status: status),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -42,10 +50,10 @@ class StudentAdmissionListWidget extends StatelessWidget {
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
                 child: Text(
-                  "No admission found",
+                  "No student found",
                   style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 12.0 : 18.0,
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -81,6 +89,7 @@ class StudentAdmissionListWidget extends StatelessWidget {
                 source: DataTableSourceImpl(
                   admissions: admissions,
                   context: context,
+                  type: type
                 ),
               ),
             );
@@ -97,7 +106,8 @@ class StudentAdmissionListWidget extends StatelessWidget {
       DataColumn(label: _buildHeader("Father Name")),
       DataColumn(label: _buildHeader("Class")),
       DataColumn(label: _buildHeader("Contact#")),
-      DataColumn(label: _buildHeader("Address")),
+      // DataColumn(label: _buildHeader("Address")),
+      DataColumn(label: _buildHeader("Status")),
       DataColumn(label: _buildHeader("Action")),
     ];
   }
@@ -116,10 +126,12 @@ class StudentAdmissionListWidget extends StatelessWidget {
 class DataTableSourceImpl extends DataTableSource {
   final List<RegistrationFormModel> admissions;
   final BuildContext context;
+  final UIType type;
 
   DataTableSourceImpl({
     required this.admissions,
     required this.context,
+    required this.type,
   });
 
   @override
@@ -136,8 +148,28 @@ class DataTableSourceImpl extends DataTableSource {
         DataCell(AppTextWidget(text: student.fatherName, color: Colors.black)),
         DataCell(AppTextWidget(text: student.className, color: Colors.black)),
         DataCell(AppTextWidget(text: student.contactNumber, color: Colors.black)),
-        DataCell(AppTextWidget(text: student.address, color: Colors.black)),
-        DataCell(_buildActionCell(context,student.formId)),
+        // DataCell(AppTextWidget(text: student.address, color: Colors.black)),
+        DataCell(
+            Container(
+              width: 80.0,
+              height: 30,
+              // padding:const EdgeInsets.symmetric(
+              //   vertical: 10.0
+              // ),
+              decoration:  BoxDecoration(
+                color:  student.status == "ACTIVE" ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: AppTextWidget(
+                  fontSize: 11,
+                text: student.status,
+                color:Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+              ),
+            )),
+        DataCell(_buildActionCell(context,student,type)),
       ],
     );
   }
@@ -175,21 +207,71 @@ class DataTableSourceImpl extends DataTableSource {
     );
   }
 
-  Widget _buildActionCell(BuildContext context,String formID) {
+  Widget _buildActionCell(BuildContext context,RegistrationFormModel student,UIType type) {
+    final provider = Provider.of<RegistrationProvider>(context,listen: false);
+    final menuP = Provider.of<MenuProvider>(context,listen: false);
+    final pickP = Provider.of<PickerProvider>(context,listen: false);
     return Row(
       children: [
+        if(UIType.List == type)
         InkWell(
-          onTap: () {}, // Add edit action here
-          child: Icon(Icons.edit, color: Colors.white, size: Responsive.isMobile(context) ? 24 : 30),
+          onTap: () {
+            MenuModel model =  MenuModel(icon: 'assets/svg/profile.svg', title: AppString.newAdmission);
+            pickP.clear();
+            provider.resetAllControllers();
+            provider.updateStudent(student,type: FormType.edit.name);
+            menuP.selectSubItem(model);
+          }, // Add edit action here
+          child: Icon(Icons.remove_red_eye, color: Colors.grey, size: Responsive.isMobile(context) ? 24 : 25),
+        ),
+        if(UIType.Expense == type)
+        InkWell(
+          onTap: () {
+            // MenuModel model =  MenuModel(icon: 'assets/svg/profile.svg', title: AppString.newAdmission);
+            // pickP.clear();
+            // provider.resetAllControllers();
+            provider.updateStudent(student,type: FormType.view.name);
+            Get.toNamed(RoutesName.addStudentExpenseScreen);
+            // Get.toNamed();
+            // menuP.selectSubItem(model);
+          }, // Add edit action here
+          child: Row(
+            children: [
+              Container(
+                width: 80.0,
+                height: 30,
+                decoration:  BoxDecoration(
+                  color:  Colors.blue,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: AppTextWidget(
+                    fontSize: 11,
+                    text: "Add Expense",
+                    color:Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Icon(Icons.remove_red_eye, color: Colors.grey, size: Responsive.isMobile(context) ? 24 : 25),
+            ],
+          ),
         ),
         const SizedBox(width: 5),
-        InkWell(
-          onTap: () async{
-           await firestore.collection(DbKey.admissions).doc(formID).delete();
-           AppUtils().showToast(text: "Student Deleted");
-          }, // Add delete action here
-          child: Icon(Icons.delete, color: Colors.red, size: Responsive.isMobile(context) ? 24 : 30),
-        ),
+        // InkWell(
+        //   onTap: () async{
+        //
+        //     AppUtils().webAlertDialog(
+        //       rightPress: () async{
+        //         Navigator.of(context).pop();
+        //         await firestore.collection(DbKey.admissions).doc(student.formId).delete();
+        //         AppUtils().showWebToast(text: "Student Deleted");
+        //       }
+        //     );
+        //
+        //   }, // Add delete action here
+        //   child: Icon(Icons.remove_red_eye, color: Colors.grey, size: Responsive.isMobile(context) ? 24 : 30),
+        // ),
       ],
     );
   }
@@ -214,9 +296,9 @@ class _SearchField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: TextField(
-        onChanged: (value) => searchProvider.updateSearchTerm(value.toUpperCase()),
+        onChanged: (value) => searchProvider.updateSearchTerm(value.toLowerCase()),
         decoration: InputDecoration(
-          labelText: "Search by CNIC, Group, or Class",
+          labelText: "Search by CNIC, Name, or Class",
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),

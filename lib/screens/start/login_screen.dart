@@ -1,21 +1,16 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:legends_schools_admin/config/component/app_text_field.dart';
-import 'package:legends_schools_admin/config/component/app_text_widget.dart';
 import 'package:legends_schools_admin/config/component/button_widget.dart';
 import 'package:legends_schools_admin/config/extenstion/extenstion.dart';
+import 'package:legends_schools_admin/config/util/app_utils.dart';
 import 'package:legends_schools_admin/routes/routes_name.dart';
-import 'package:legends_schools_admin/utils/web_utils.dart';
-import 'package:sizer/sizer.dart';
 
 import '../../config/res/app_assets.dart';
 import '../../config/color/my_color.dart';
-import '../../config/component/my_input_field.dart';
-import '../../constant.dart';
+import '../../config/util/web_utils.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -31,7 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     getUserValues();
   }
 
@@ -109,6 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 20,),
 
+
                     ButtonWidget(
                         width: 200,
                         text: "Login Now", onClicked: () async{
@@ -117,7 +112,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       {
                         if(password == passwordController.text.toString().toLowerCase())
                         {
+                          AppUtils().showWebToast(
+                            text: "Login Successful"
+                          );
                           Get.offAllNamed(RoutesName.drawerScreen);
+
                         }
                         else{
                           WebUtils().errorToast("invalid password");
@@ -144,3 +143,4 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 }
+

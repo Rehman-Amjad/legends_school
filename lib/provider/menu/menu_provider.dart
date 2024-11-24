@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:legends_schools_admin/screens/admission/admission_form_screen.dart';
 import 'package:legends_schools_admin/screens/admission/admission_screen.dart';
 import 'package:legends_schools_admin/screens/cards/student_card_serach.dart';
+import 'package:legends_schools_admin/screens/expense/studentExpense/student_daily_expense.dart';
+import 'package:legends_schools_admin/screens/fees/fee_status_list_screen.dart';
 import 'package:legends_schools_admin/screens/teacher/teacher_register.dart';
 
 import '../../Model/menu_modal.dart';
@@ -68,7 +70,7 @@ class MenuProvider extends ChangeNotifier {
   void selectSubItem(MenuModel subItem) {
     if (_selectedSubItem != subItem) {
       _selectedSubItem = subItem;
-      _cachedSelectedScreen = null; // Clear cache on sub-item change
+      _cachedSelectedScreen = null;
       notifyListeners();
     }
   }
@@ -103,32 +105,18 @@ class MenuProvider extends ChangeNotifier {
           case AppString.studentCard:
             _cachedSelectedScreen = StudentCardScreen();
             break;
-          // case AppString.feeSlip:
-          //   _cachedSelectedScreen = FeeSlipScreen();
-          //   break;
+          case AppString.feeSlip:
+            _cachedSelectedScreen = FeeStatusListScreen();
+            break;
           case AppString.addNewTeacher:
             _cachedSelectedScreen = TeacherRegisterScreen();
             break;
           case AppString.teacherList:
-            _cachedSelectedScreen = TeacherListScreen();
+            _cachedSelectedScreen = const TeacherListScreen();
             break;
-          // case AppString.assignClasses:
-          //   _cachedSelectedScreen = AssignTeacherSubjectScreen();
-          //   break;
-          // case AppString.dailyExpense:
-          //   _cachedSelectedScreen = StudentDailyExpenseScreen();
-          //   break;
-          // case AppString.parentCard:
-          //   _cachedSelectedScreen = ParentCardSearch();
-          //   break;
-          // case AppString.studentCard:
-          //   _cachedSelectedScreen = StudentCardScreen();
-          //   break;
-          // case AppString.teacherCard:
-          //   _cachedSelectedScreen = TeacherCardScreen();
-          //   break;
-          // default:
-          //   _cachedSelectedScreen = AdmissionListScreen();
+          case AppString.studentExpense:
+            _cachedSelectedScreen = const StudentDailyExpense();
+            break;
         }
       } else {
         switch (_expandedIndex) {

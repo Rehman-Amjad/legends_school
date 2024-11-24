@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:legends_schools_admin/config/enum/form_type.dart';
+import 'package:legends_schools_admin/provider/registration/registration_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../Model/menu_modal.dart';
@@ -13,10 +15,12 @@ import '../res/app_string.dart';
 class Menu extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
+
   const Menu({Key? key, required this.scaffoldKey}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     final List<MenuModel> menu = [
       MenuModel(icon: 'assets/svg/home.svg', title: AppString.dashboard),
       MenuModel(
@@ -41,7 +45,8 @@ class Menu extends StatelessWidget {
         subItems: [
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentSearch),
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentCard),
-          // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.parentCard),
+          MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentPromotion),
+          MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentExpense),
           // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.dailyExpense),
           // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.testMarks),
         ],
@@ -208,13 +213,14 @@ class Menu extends StatelessWidget {
 
   Widget _buildSubMenuItem(MenuModel subItem, MenuProvider provider, BuildContext context) {
     bool isActive = provider.isActiveSubItem(subItem);
-
+    final regP = Provider.of<RegistrationProvider>(context,listen: false);
     return MouseRegion(
       onEnter: (_) => provider.setHoveredSubItem(subItem),
       onExit: (_) => provider.setHoveredSubItem(null),
       child: InkWell(
         onTap: () {
           log("message:: ${subItem.title},");
+          regP.updateType(FormType.newForm.name);
           provider.selectSubItem(subItem); // Mark this sub-item as selected
           // if (subItem.routes != null) {
           //   Navigator.pushNamed(context, subItem.routes!);
@@ -233,15 +239,15 @@ class Menu extends StatelessWidget {
           ),
           child: Row(
             children: [
-              SvgPicture.asset(
-                subItem.icon,
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  isActive ? Colors.white : Colors.white, // Active icon color
-                  BlendMode.srcIn,
-                ),
-              ),
+              // SvgPicture.asset(
+              //   subItem.icon,
+              //   width: 20,
+              //   height: 20,
+              //   colorFilter: ColorFilter.mode(
+              //     isActive ? Colors.white : Colors.white, // Active icon color
+              //     BlendMode.srcIn,
+              //   ),
+              // ),
               const SizedBox(width: 10),
               Text(
                 subItem.title,

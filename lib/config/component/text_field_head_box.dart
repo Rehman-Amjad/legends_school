@@ -18,14 +18,15 @@ class TextFieldHeadBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(5.0),
+      margin: const EdgeInsets.all(5.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppTextWidget(text: labelText, color: Colors.black, fontSize: 16.0),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           AppTextField(
+            press: press,
               hintText: hintText,
               controller: controller,
             keyboardType: textInputType,

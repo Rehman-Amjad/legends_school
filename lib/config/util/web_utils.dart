@@ -25,4 +25,18 @@ class WebUtils{
     return DateFormat('MMMM yyyy').format(date);
   }
 
+  String formatCurrency(double amount) {
+    final formatter = NumberFormat.currency(locale: 'en_PK', symbol: '₨', decimalDigits: 2);
+    return formatter.format(amount);
+  }
+
+  String formatCNIC(String cnic) {
+    final cleaned = cnic.replaceAll(RegExp(r'\D'), '');
+    if (cleaned.length != 13) {
+      throw const FormatException("Invalid CNIC Number");
+    }
+    return '${cleaned.substring(0, 5)}-${cleaned.substring(5, 12)}-${cleaned.substring(12)}';
+  }
+
+
 }

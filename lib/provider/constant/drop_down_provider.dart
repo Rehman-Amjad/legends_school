@@ -21,6 +21,9 @@ class DropdownProvider extends ChangeNotifier{
   List<String> get genderList => _genderList;
   String get selectedGender => _selectedGender;
 
+  set selectedGender(String value) {
+    _selectedGender = value;
+  }
   void changeGender(String gender){
     _selectedGender = gender;
     notifyListeners();
@@ -28,7 +31,7 @@ class DropdownProvider extends ChangeNotifier{
 
   // Fee Plans
   String _selectedFeePlan = 'MONTHLY';
-  final List<String> _feePlanList = ['MONTHLY','QUARTERLY','YEARLY'];
+  final List<String> _feePlanList = ['MONTHLY'];
 
   List<String> get feePlanList => _feePlanList;
   String get selectedFeePlan => _selectedFeePlan;
@@ -69,6 +72,10 @@ class DropdownProvider extends ChangeNotifier{
   List<String> get classList => _classList;
   String get selectedClass => _selectedClass;
 
+  set selectedClass(String value){
+    _selectedClass = value;
+  }
+
   void changeClass(String studentClass){
     _selectedClass = studentClass;
     notifyListeners();
@@ -85,6 +92,10 @@ class DropdownProvider extends ChangeNotifier{
 
   List<String> get groupList => _groupList;
   String get selectedGroup => _selectedGroup;
+
+  set selectedGroup(String value){
+    _selectedGroup = value;
+  }
 
   void changeGroup(String studentGroup){
     _selectedGroup = studentGroup;
@@ -106,6 +117,22 @@ class DropdownProvider extends ChangeNotifier{
     _selectedStatus = academyStatus;
     notifyListeners();
   }
+
+  String _selectedExpense = 'Other';
+  final List<String> _studentExpenseList = [
+    "Stationary",
+    "Other",
+  ];
+
+  List<String> get studentExpenseList => _studentExpenseList;
+  String get selectedExpense => _selectedExpense;
+
+  void updateExpenseType(int index){
+    _selectedExpense = _studentExpenseList[index];
+    notifyListeners();
+  }
+
+
 
 
   void clear(){

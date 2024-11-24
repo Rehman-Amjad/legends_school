@@ -185,9 +185,9 @@ class RegistrationPdf{
 
 
     final feeTable = Table5columnPdf(
-      text1: "Daily Test".toUpperCase(),
-      text2: "Services Charges".toUpperCase(),
-      text3: "Extra Charges".toUpperCase(),
+      text1: "Paper Fund".toUpperCase(),
+      text2: "Admission Fee".toUpperCase(),
+      text3: "Overtime Fee".toUpperCase(),
       text4: "Discount Fee".toUpperCase(),
       color1: PdfColors.blueAccent,
       color2: PdfColors.blueAccent,
@@ -196,9 +196,9 @@ class RegistrationPdf{
       color5: PdfColors.blueAccent,
     );
     final feeDetailsTable = Table5columnPdf(
-        text1: student.dailyTest,
-        text2: student.servicesFee,
-        text3: student.extraCharges,
+        text1: student.paperFundFee,
+        text2: student.admissionFee,
+        text3: student.overtimeFee,
         text4: student.discountCharges,
     );
 

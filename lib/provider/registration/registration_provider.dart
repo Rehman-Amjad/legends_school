@@ -2,19 +2,25 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
-import 'package:legends_schools_admin/utils/web_utils.dart';
+import 'package:legends_schools_admin/model/daily_expense_model.dart';
+import 'package:legends_schools_admin/provider/constant/drop_down_provider.dart';
+import 'package:legends_schools_admin/provider/fee_management_provider.dart';
+import 'package:legends_schools_admin/config/util/time_utils.dart';
+import 'package:provider/provider.dart';
 
+import '../../config/enum/fee_type.dart';
 import '../../config/util/app_utils.dart';
 import '../../constant.dart';
+import '../../model/fee.dart';
 import '../../model/fees_model.dart';
 import '../../model/registration_form_model.dart';
-import '../../model/student_model.dart';
 import '../../model/teacher_model.dart';
 
 class RegistrationProvider extends ChangeNotifier{
 
+
   String _totalDues = "0";
+  String _formType = "new";
   String _totalSubjectFee = "0";
 
 
@@ -23,9 +29,9 @@ class RegistrationProvider extends ChangeNotifier{
   var fatherCNICController = TextEditingController();
   var groupNameController = TextEditingController();
   var schoolNameController = TextEditingController();
-  var dailyTestController = TextEditingController();
-  var servicesChargesController = TextEditingController();
-  var extraChargesController = TextEditingController();
+  var paperFundFeeController = TextEditingController();
+  var admissionFeeController = TextEditingController();
+  var overtimeFeeController = TextEditingController();
   var discountController = TextEditingController();
   var bFormController = TextEditingController();
   var studentReferenceController = TextEditingController();
@@ -64,9 +70,9 @@ class RegistrationProvider extends ChangeNotifier{
     contactNumber: '',
     whatsappNumber: '',
     residenceNumber: '',
-    dailyTest: '',
-    servicesFee: '',
-    extraCharges: '',
+    paperFundFee: '',
+    admissionFee: '',
+    overtimeFee: '',
     discountCharges: '',
     gender: '',
     admissionDate: '',
@@ -79,29 +85,62 @@ class RegistrationProvider extends ChangeNotifier{
   );
 
   String get totalDues => _totalDues;
+  String get formType => _formType;
   String get totalSubjectFee => _totalSubjectFee;
   RegistrationFormModel get student => _student;
 
-  void updateStudent(RegistrationFormModel student) {
+  void updateStudent(RegistrationFormModel student,{String type = "new"}) {
     _student = student;
+    _formType = type;
     notifyListeners();
   }
 
-  Future<void> uploadStudentData() async {
+  void updateType(String type){
+    _formType = type;
+    notifyListeners();
+  }
+
+  Future<void> updateStudentData() async{
+    await firestore.collection('students').doc(_student.formId).update(_student.toMap()).whenComplete((){
+      AppUtils().showToast(text: "Student Update Successfully");
+    });
+  }
+
+
+  Future<void> uploadStudentData(BuildContext context) async {
+
+    final provider = Provider.of<FeeManagementProvider>(context,listen: false);
 
     await firestore.collection('students').doc(_student.formId).set(_student.toMap()).whenComplete((){
       AppUtils().showToast(text: "Student Registered Successfully");
     });
 
-    await saveFeeData(
-        studentId: student.registrationNumber,
-        billingCycle: WebUtils().formatTimeMonthYear(DateTime.now().millisecondsSinceEpoch).toString(),
-        dueDate: DateTime.now(),
-        amountDue: student.totalDues.toString(),
-        amountPaid: "0",
-        paymentStatus: student.feeStatus,
-
+    final fee = Fee(
+      amount: double.parse(_student.totalDues),
+      status: _student.feeStatus == "PAID" ? FeeType.Paid.name : FeeType.Unpaid.name,
+      paidAmount: 0,
+      paidDate: DateTime(2024, 1, 15),
+      pendingDues: 0.0,
+      previousMonthDues: 0.0,
+      lateFee: 0.0,
+      scholarshipDiscount: 0.0,
     );
+
+    await provider.addFeeAndUpdateMonthlyStatus(
+        studentId: _student.formId,
+        feeModel: fee,
+        monthYear: TimeUtils().getMonthYearFromTimestamp()
+    );
+
+  }
+
+  Future<void> addFee(String studentId, Fee fee) async {
+    await firestore
+        .collection('students')
+        .doc(studentId)
+        .collection('fees')
+        .add(fee.toMap());
+    notifyListeners();
   }
   void setTotalDues(String value){
     _totalDues = value;
@@ -133,6 +172,16 @@ class RegistrationProvider extends ChangeNotifier{
         });
         amountDue = "0";
         amountPaid = amountDue;
+      }else{
+        paymentHistory.add({
+          'paymentDate': DateTime.now().toIso8601String(),
+          'timeStamp': DateTime.now().toIso8601String(),
+          'amount': "0",
+          'paymentMethod': 'Cash',
+          'receiptId': '1234312'
+        });
+        amountDue = amountDue;
+        amountPaid = "0";
       }
 
       DocumentReference feeRef = firestore.collection('Fees').doc(studentId);
@@ -170,7 +219,7 @@ class RegistrationProvider extends ChangeNotifier{
   // Get fees for the last week
   Stream<List<FeeModel>> getLastWeekFees() {
     final DateTime now = DateTime.now();
-    final DateTime startOfWeek = now.subtract(Duration(days: 7));
+    final DateTime startOfWeek = now.subtract(const Duration(days: 7));
     return _queryFees(startOfWeek, now);
   }
 
@@ -196,9 +245,9 @@ class RegistrationProvider extends ChangeNotifier{
     fatherCNICController.text = "";
     groupNameController.text = "";
     schoolNameController.text = "";
-    dailyTestController.text = "0";
-    servicesChargesController.text = "0";
-    extraChargesController.text = "0";
+    paperFundFeeController.text = "0";
+    admissionFeeController.text = "0";
+    overtimeFeeController.text = "0";
     discountController.text = "0";
     bFormController.text = "";
     studentReferenceController.text = "";
@@ -225,14 +274,61 @@ class RegistrationProvider extends ChangeNotifier{
 
   bool filterAdmissions(RegistrationFormModel student) {
     return student.fatherCNIC.contains(_searchTerm) ||
-        student.address.contains(_searchTerm) ||
+        student.name.toLowerCase().contains(_searchTerm) ||
         student.className.contains(_searchTerm);
+  }
+
+  List<DailyExpenseModel> filterExpenses(
+      List<DailyExpenseModel> expenses) {
+    return expenses.where((expense) {
+      return expense.description.toLowerCase().contains(_searchTerm) ||
+          expense.paymentMethod.toLowerCase().contains(_searchTerm) ||
+          expense.timeStamp.contains(_searchTerm);
+    }).toList();
   }
 
   bool filterTeachers(TeacherModel student) {
     return student.teacherCNIC.contains(_searchTerm) ||
         student.teacherClass.contains(_searchTerm) ||
         student.teacherName.contains(_searchTerm);
+  }
+
+
+  void showUpdateData(BuildContext context){
+    
+    final provider = Provider.of<DropdownProvider>(context,listen: false);
+    
+    registrationController.text = _student.registrationNumber;
+    nameController.text = _student.name;
+    fatherNameController.text = _student.fatherName;
+    fatherCNICController.text = _student.fatherCNIC;
+    dobController.text = _student.studentDOB;
+    religionController.text = _student.religion;
+    nationalityController.text = _student.nationality;
+    addressController.text = _student.address;
+    contactNumberController.text = _student.contactNumber;
+    whatsappNumberController.text = _student.whatsappNumber;
+    medicalConditionController.text = _student.medicalCondition;
+    residenceNumberController.text = _student.residenceNumber;
+    bFormController.text = _student.bForm;
+    studentReferenceController.text = _student.referenceName;
+    imageURLController.text = _student.pdfImageUrl;
+    feeController.text = _student.feePlan;
+    schoolNameController.text = _student.schoolName;
+    admissionFeeController.text = _student.paperFundFee;
+    paperFundFeeController.text = _student.admissionFee;
+    overtimeFeeController.text = _student.overtimeFee;
+    discountController.text = _student.discountCharges;
+
+    feeController.text = _student.totalDues;
+
+    provider.selectedGender = _student.gender;
+    provider.selectedClass = _student.className;
+    if(_student.fatherOccupation.isNotEmpty){
+      provider.selectedGroup = _student.fatherOccupation;
+    }
+
+
   }
 
 }

@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:legends_schools_admin/config/component/app_text_field.dart';
 import 'package:legends_schools_admin/config/component/app_text_widget.dart';
+import 'package:legends_schools_admin/config/enum/form_type.dart';
 import 'package:legends_schools_admin/screens/admission/pdf/registration_pdf.dart';
 import 'package:provider/provider.dart';
 import '../../config/component/button_widget.dart';
@@ -20,6 +23,7 @@ class AdmissionFormScreen extends StatelessWidget {
 
   AdmissionFormScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     final dropDownProvider = Provider.of<DropdownProvider>(context,listen: false);
@@ -28,16 +32,35 @@ class AdmissionFormScreen extends StatelessWidget {
     final imageProvider = Provider.of<PickerProvider>(context,listen: false);
 
     formProvider.fetchCountValue();
-    regP.dailyTestController.text = "0";
-    regP.servicesChargesController.text = "0";
-    regP.extraChargesController.text = "0";
+    regP.paperFundFeeController.text = "0";
+    regP.admissionFeeController.text = "0";
+    regP.overtimeFeeController.text = "0";
     regP.discountController.text = "0";
+
+    final isUpdate = regP.formType == FormType.edit.name;
+    if(isUpdate){
+      regP.showUpdateData(context);
+      Future.microtask(() {
+        regP.setTotalDues(regP.student.totalDues);
+        dropDownProvider.changeGender(regP.student.gender);
+        dropDownProvider.changeClass(regP.student.className);
+        dropDownProvider.changeFeePlan(regP.student.feePlan);
+        dropDownProvider.changeFeeStatus(regP.student.feeStatus);
+        dropDownProvider.changeAcademyStatus(regP.student.status);
+      });
+    }else{
+      Future.microtask((){
+        dropDownProvider.clear();
+        regP.resetAllControllers();
+        imageProvider.clear();
+      });
+    }
     return Scaffold(
       appBar: AppBar(
         title: AppTextWidget(text: "Student Registration",
           fontSize: 18.0,color: Colors.black),
         centerTitle: true,
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.blueAccent,
       ),
       backgroundColor: Colors.grey.shade200,
       body: SingleChildScrollView(
@@ -49,13 +72,13 @@ class AdmissionFormScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20.0,),
+                const SizedBox(height: 20.0,),
                 AppTextWidget(text: "Students Registration Form", color: Colors.black,
                     fontSize: 18.0, fontWeight: FontWeight.bold,),
-                SizedBox(height: 20.0,),
+                const SizedBox(height: 20.0,),
                 Container(
                   width: Get.width,
-                  padding: EdgeInsets.all(40.0),
+                  padding: const EdgeInsets.all(40.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(5.0),
@@ -64,7 +87,7 @@ class AdmissionFormScreen extends StatelessWidget {
                         color: Colors.black.withOpacity(0.1),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 3), // changes position of shadow
+                        offset: const Offset(0, 3), // changes position of shadow
                       ),
                     ],
                   ),
@@ -78,7 +101,8 @@ class AdmissionFormScreen extends StatelessWidget {
                         children: [
                           Consumer<FormIdProvider>(
                             builder: (context,provider,child){
-                              return AppTextWidget(text: "Form Number: ${provider.formID}",
+                              return AppTextWidget(
+                                text: "Form Number:  ${isUpdate ?  regP.student.formId : provider.formID}",
                                   color: Colors.red, fontSize: 20.0, fontWeight: FontWeight.bold,);
                             },
                           ),
@@ -94,10 +118,11 @@ class AdmissionFormScreen extends StatelessWidget {
                                           width: 200.0,
                                           height: 200.0,
                                           color: Colors.grey,
-                                          child: provider.pickedImage != null ? Image.memory(provider.pickedImage!) :
-                                          null
+                                          child: provider.pickedImage != null ?
+                                          Image.memory(provider.pickedImage!) :
+                                          isUpdate ? Image.network(regP.student.pdfImageUrl)  :  null
                                       ),
-                                      SizedBox(height: 20.0,),
+                                      const SizedBox(height: 20.0,),
                                       ButtonWidget(text: "Upload", onClicked: () async{
                                         provider.pickImage();
                                       }, width: 100.0, height: 50.0,)
@@ -108,7 +133,7 @@ class AdmissionFormScreen extends StatelessWidget {
                           )
                         ],
                       ),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -118,7 +143,7 @@ class AdmissionFormScreen extends StatelessWidget {
                           Expanded(child: TextFieldHeadBox(labelText: "Father CNIC*",hintText: "Father CNIC",controller: regP.fatherCNICController,),),
                         ],
                       ),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -129,10 +154,28 @@ class AdmissionFormScreen extends StatelessWidget {
                                 press: (){
                                   _selectDate(context);
                                 },
-                                labelText: "Student DOB*",hintText: regP.dobController.text =
-                                  provider.dobDate,controller: regP.dobController,);
+                                labelText: "Student DOB*",hintText:
+                                  isUpdate ? regP.dobController.text = regP.student.studentDOB :
+                                  regP.dobController.text = provider.dobDate,
+                                controller: regP.dobController,);
                             },
                           )
+                          // ConstrainedBox(
+                          //   constraints: const BoxConstraints(maxWidth: 600),
+                          //   child: ShadDatePicker(
+                          //     closeOnSelection: false,  // Ensure dropdown doesn't close automatically
+                          //     closeOnTapOutside: false,
+                          //     popoverDecoration: ShadDecoration(
+                          //       color: primaryColor
+                          //     ),
+                          //     captionLayout: ShadCalendarCaptionLayout.dropdown,
+                          //     backgroundColor: Colors.white,
+                          //     hoverBackgroundColor: Colors.white,
+                          //     onChanged: (date){
+                          //       log("date: $date");
+                          //     },
+                          //   ),
+                          // ),
                           ),
                           Expanded(child: TextFieldHeadBox(labelText: "Religion*",hintText: "Religion",controller: regP.religionController,),),
                           Expanded(child: TextFieldHeadBox(labelText: "Nationality*",hintText: "Nationality",controller: regP.nationalityController,),),
@@ -140,7 +183,7 @@ class AdmissionFormScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -151,7 +194,7 @@ class AdmissionFormScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Consumer<DropdownProvider>(
                         builder: (context, provider, child){
                           return Row(
@@ -160,28 +203,32 @@ class AdmissionFormScreen extends StatelessWidget {
 
                               Expanded(
                                   child: DropDownHeadBox(
-                                    items: provider.genderList, selectedItem: provider.selectedGender,
+                                    items: provider.genderList,
+                                    selectedItem: isUpdate ? regP.student.gender  :   provider.selectedGender,
                                     onChanged: (value){
                                       provider.changeGender(value.toString());
                                     }, labelText: 'Gender*',)
                               ),
                               Expanded(
                                   child: DropDownHeadBox(
-                                    items: provider.classList, selectedItem: provider.selectedClass,
+                                    items: provider.classList,
+                                    selectedItem: isUpdate ?  regP.student.className : provider.selectedClass,
                                     onChanged: (classValue){
                                       provider.changeClass(classValue.toString());
                                     }, labelText: 'Student Class*',)
                               ),
                               Expanded(
                                   child: DropDownHeadBox(
-                                    items: provider.groupList, selectedItem: provider.selectedGroup,
+                                    items: provider.groupList,
+                                    selectedItem: provider.selectedGroup,
                                     onChanged: (value){
                                       provider.changeGroup(value.toString());
                                     }, labelText: 'Father Occupation*',)
                               ),
                               Expanded(
                                   child: DropDownHeadBox(
-                                    items: provider.statusList, selectedItem: provider.selectedStatus,
+                                    items: provider.statusList,
+                                    selectedItem: isUpdate ?  regP.student.status : provider.selectedStatus,
                                     onChanged: (value){
                                       provider.changeAcademyStatus(value.toString());
                                     }, labelText: 'Status*',)
@@ -191,7 +238,7 @@ class AdmissionFormScreen extends StatelessWidget {
                         },
                       ),
 
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -203,7 +250,7 @@ class AdmissionFormScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -214,9 +261,9 @@ class AdmissionFormScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 30.0,),
-                      Divider(),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 30.0,),
+                      const Divider(),
+                      const SizedBox(height: 20.0,),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -241,32 +288,34 @@ class AdmissionFormScreen extends StatelessWidget {
                       ),
 
                       const SizedBox(height: 30.0,),
-                      Divider(),
-                      SizedBox(height: 20.0,),
+                      const Divider(),
+                      const SizedBox(height: 20.0,),
                       AppTextWidget(text: "Student Fee Details", color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold,),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: TextFieldHeadBox(labelText: "Daily Test*",hintText: "Daily Test",controller: regP.dailyTestController,),),
-                          Expanded(child: TextFieldHeadBox(labelText: "Services Charges*",hintText: "Services Charges",controller: regP.servicesChargesController,),),
-                          Expanded(child: TextFieldHeadBox(labelText: "Extra Charges*",hintText: "Extra Charges",controller: regP.extraChargesController,),),
+                          Expanded(child: TextFieldHeadBox(labelText: "Paper Fund*",hintText: "Daily Test",controller: regP.paperFundFeeController,),),
+                          Expanded(child: TextFieldHeadBox(labelText: "Admission Fee*",hintText: "Services Charges",controller: regP.admissionFeeController,),),
+                          Expanded(child: TextFieldHeadBox(labelText: "Overtime Fee*",hintText: "Extra Charges",controller: regP.overtimeFeeController,),),
                           Expanded(child: TextFieldHeadBox(labelText: "Discount Charges*",hintText: "Discount Charges",controller:regP. discountController,),),
                         ],
                       ),
 
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: SizedBox()),
-                          Expanded(child: SizedBox()),
-                          Expanded(child: SizedBox()),
+                          const Expanded(child: SizedBox()),
+                          const Expanded(child: SizedBox()),
+                          const Expanded(child: SizedBox()),
                           Expanded(child:
                           Consumer<DropdownProvider>(
                             builder: (context, provider, child){
-                              return DropDownHeadBox(items: provider.feeStatusList,
-                                selectedItem: provider.selectedFeeStatus, onChanged: (String? value) {
+                              return DropDownHeadBox(
+                                items: provider.feeStatusList,
+                                selectedItem: isUpdate ? regP.student.feeStatus  :  provider.selectedFeeStatus,
+                                onChanged: (String? value) {
                                   provider.changeFeeStatus(value.toString());
                                 }, labelText: 'Fee Status',);
                             },
@@ -275,11 +324,11 @@ class AdmissionFormScreen extends StatelessWidget {
                         ],
                       ),
 
-                      SizedBox(height: 30.0,),
-                      Divider(),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 30.0,),
+                      const Divider(),
+                      const SizedBox(height: 20.0,),
                       AppTextWidget(text: "Student Fee Plans", color: Colors.black, fontSize: 18.0, fontWeight: FontWeight.bold,),
-                      SizedBox(height: 20.0,),
+                      const SizedBox(height: 20.0,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -293,105 +342,158 @@ class AdmissionFormScreen extends StatelessWidget {
                               },
                             ),
                           ),
-                          Expanded(child: SizedBox()),
-                          Expanded(child: SizedBox()),
-                          Expanded(child: SizedBox()),
+                          const Expanded(child: SizedBox()),
+                          const Expanded(child: SizedBox()),
+                           Expanded(child: Consumer<RegistrationProvider>(
+                              builder: (context, provider, child){
+                                return AppTextWidget(
+                                    text: "Total Fee: PKR ${provider.totalDues}",
+                                    color: Colors.black,
+                                    fontSize: 18.0);
+                              },
+                           ),
+                          ),
 
                         ],
                       ),
 
-                      SizedBox(height: 30.0,),
-                      Consumer<RegistrationProvider>(
-                        builder: (context, provider, child){
-                          return  Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      const SizedBox(height: 30.0,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  ButtonWidget(
-                                      index: 0,
-                                      text: "Calculate", onClicked: () async{
-                                    provider.setTotalDues(((int.parse(regP.dailyTestController.text) +
-                                        int.parse(regP.servicesChargesController.text) +
-                                        int.parse(regP.extraChargesController.text) +
-                                        int.parse(regP.feeController.text)) -
-                                        int.parse(regP.discountController.text)).toString());
-                                  }, width: 200.0, height: 50.0),
-                                  SizedBox(width: 10.0,),
-                                  ButtonWidget(
-                                    index: 1,
-                                    text: "Preview",
-                                    width: 200.0,
-                                    height: 50.0,
-                                    onClicked: () async{
+                              _calculateButton(regP),
+                              const SizedBox(width: 10.0,),
+                              ButtonWidget(
+                                index: 1,
+                                text: "Preview",
+                                width: 200.0,
+                                height: 50.0,
+                                onClicked: () async{
+                                  final student = RegistrationFormModel(
+                                    timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+                                    formId: formProvider.formID.toString(),
+                                    registrationNumber: regP.registrationController.text.toString(),
+                                    name:regP. nameController.text.toString(),
+                                    status: dropDownProvider.selectedStatus,
+                                    fatherName: regP.fatherNameController.text.toString(),
+                                    fatherCNIC: regP.fatherCNICController.text.toString(),
+                                    studentDOB: regP.dobController.text.toString(),
+                                    religion: regP.religionController.text.toString(),
+                                    nationality: regP.nationalityController.text.toString(),
+                                    medicalCondition: regP.medicalConditionController.text.toString(),
+                                    address: regP.addressController.text.toString(),
+                                    schoolName: regP.schoolNameController.text.toString(),
+                                    referenceName: regP.studentReferenceController.text.toString(),
+                                    pdfImageUrl: regP.imageURLController.text.toString(),
+                                    contactNumber: regP.contactNumberController.text.toString(),
+                                    whatsappNumber: regP.whatsappNumberController.text.toString(),
+                                    residenceNumber: regP.residenceNumberController.text.toString(),
+                                    paperFundFee: regP.paperFundFeeController.text.toString(),
+                                    admissionFee: regP.admissionFeeController.text.toString(),
+                                    overtimeFee: regP.overtimeFeeController.text.toString(),
+                                    discountCharges: regP.discountController.text.toString(),
+                                    bForm: regP.bFormController.text.toString(),
+                                    gender: dropDownProvider.selectedGender.toString(),
+                                    className: dropDownProvider.selectedClass.toString(),
+                                    groupName: dropDownProvider.selectedGroup.toString(),
+                                    feeStatus: dropDownProvider.selectedFeeStatus,
+                                    totalDues: regP.totalDues.toString(),
+                                    profileImage: imageProvider.pickedImage.toString(),
+                                    feePlan: dropDownProvider.selectedFeePlan.toString(),
+                                    fatherOccupation: '',
+                                  );
+                                  RegistrationPdf().generatePDF(context,student);
+                                  //  RegistrationPdf().generatePDF(context);
+                                  // try{
+                                  //   await Printing.layoutPdf(
+                                  //     onLayout: (PdfPageFormat format) async => RegistrationPdf().generatePDF(context),
+                                  //     name: "pdfFileName",
+                                  //   );
+                                  // }catch(e){
+                                  //   log("/////////////////////////////// ${e.toString()}");
+                                  // }finally{
+                                  //   log("/////////////////////////////// finally run");
+                                  // }
 
-                                      final student = RegistrationFormModel(
-                                        timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-                                        formId: formProvider.formID.toString(),
-                                        registrationNumber: regP.registrationController.text.toString(),
-                                        name:regP. nameController.text.toString(),
-                                        status: dropDownProvider.selectedStatus,
-                                        fatherName: regP.fatherNameController.text.toString(),
-                                        fatherCNIC: regP.fatherCNICController.text.toString(),
-                                        studentDOB: regP.dobController.text.toString(),
-                                        religion: regP.religionController.text.toString(),
-                                        nationality: regP.nationalityController.text.toString(),
-                                        medicalCondition: regP.medicalConditionController.text.toString(),
-                                        address: regP.addressController.text.toString(),
-                                        schoolName: regP.schoolNameController.text.toString(),
-                                        referenceName: regP.studentReferenceController.text.toString(),
-                                        pdfImageUrl: regP.imageURLController.text.toString(),
-                                        contactNumber: regP.contactNumberController.text.toString(),
-                                        whatsappNumber: regP.whatsappNumberController.text.toString(),
-                                        residenceNumber: regP.residenceNumberController.text.toString(),
-                                        dailyTest: regP.dailyTestController.text.toString(),
-                                        servicesFee: regP.servicesChargesController.text.toString(),
-                                        extraCharges: regP.extraChargesController.text.toString(),
-                                        discountCharges: regP.discountController.text.toString(),
-                                        bForm: regP.bFormController.text.toString(),
-                                        gender: dropDownProvider.selectedGender.toString(),
-                                        className: dropDownProvider.selectedClass.toString(),
-                                        groupName: dropDownProvider.selectedGroup.toString(),
-                                        feeStatus: dropDownProvider.selectedFeeStatus,
-                                        totalDues: regP.totalDues.toString(),
-                                        profileImage: imageProvider.pickedImage.toString(),
-                                        feePlan: dropDownProvider.selectedFeePlan.toString(),
-                                        fatherOccupation: '',
-                                      );
-                                      RegistrationPdf().generatePDF(context,student);
-                                      //  RegistrationPdf().generatePDF(context);
-                                      // try{
-                                      //   await Printing.layoutPdf(
-                                      //     onLayout: (PdfPageFormat format) async => RegistrationPdf().generatePDF(context),
-                                      //     name: "pdfFileName",
-                                      //   );
-                                      // }catch(e){
-                                      //   log("/////////////////////////////// ${e.toString()}");
-                                      // }finally{
-                                      //   log("/////////////////////////////// finally run");
-                                      // }
+                                },
+                              ),
+                              const SizedBox(width: 10.0,),
+                              if(!isUpdate)
+                                ButtonWidget(
+                                    index: 2,
+                                    text: "Save & Preview", onClicked: () async{
+                                  if(_key.currentState!.validate() && imageProvider.pickedImage !=null){
+                                    _key.currentState!.save();
+                                    ActionProvider.startLoading(index: 2);
+                                    final String imageUrl;
+                                    if(imageProvider.pickedImage !=null){
+                                      imageUrl = await imageProvider.firebaseStorageImage(image: imageProvider.pickedImage!);
+                                    }else{
+                                      imageUrl = "";
+                                    }
+                                    final _students = RegistrationFormModel(
+                                      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+                                      formId: formProvider.formID.toString(),
+                                      registrationNumber: regP.registrationController.text,
+                                      name: regP.nameController.text,
+                                      status: dropDownProvider.selectedStatus,
+                                      fatherName: regP.fatherNameController.text,
+                                      fatherCNIC: regP.fatherCNICController.text,
+                                      studentDOB: regP.dobController.text,
+                                      religion: regP.religionController.text,
+                                      nationality: regP.nationalityController.text,
+                                      medicalCondition: regP.medicalConditionController.text,
+                                      address: regP.addressController.text,
+                                      schoolName: regP.schoolNameController.text,
+                                      referenceName: regP.studentReferenceController.text,
+                                      pdfImageUrl: regP.imageURLController.text,
+                                      bForm: regP.bFormController.text,
+                                      contactNumber: regP.contactNumberController.text,
+                                      whatsappNumber: regP.whatsappNumberController.text,
+                                      residenceNumber: regP.residenceNumberController.text,
+                                      paperFundFee: regP.paperFundFeeController.text,
+                                      admissionFee: regP.admissionFeeController.text,
+                                      overtimeFee: regP.overtimeFeeController.text,
+                                      discountCharges: regP.discountController.text,
+                                      gender: dropDownProvider.selectedGender.toString(),
+                                      className: dropDownProvider.selectedClass.toString(),
+                                      groupName: dropDownProvider.selectedGroup.toString(),
+                                      feeStatus: dropDownProvider.selectedFeeStatus,
+                                      totalDues: regP.totalDues.toString(),
+                                      profileImage: imageUrl.toString(),
+                                      feePlan: dropDownProvider.selectedFeePlan.toString(), fatherOccupation: '',
+                                    );
 
-                                    },
-                                  ),
-                                 const SizedBox(width: 10.0,),
-                                  ButtonWidget(
-                                      index: 2,
-                                      text: "Save & Preview", onClicked: () async{
-                                    if(_key.currentState!.validate() && imageProvider.pickedImage !=null){
+                                    regP.updateStudent(_students);
+                                    await regP.uploadStudentData(context);
+                                    await formProvider.updateCountValue(formID: int.parse(formProvider.formID.toString()).toString());
+                                    formProvider.fetchCountValue();
+                                    ActionProvider.stopLoading(index: 2);
+                                    dropDownProvider.clear();
+                                    RegistrationPdf().generatePDF(context,_students);
+                                  }
+
+                                }, width: 200.0, height: 50.0),
+                              if(isUpdate)
+                                ButtonWidget(
+                                  index: 2,
+                                  text: "Update",
+                                  onClicked: () async {
+                                    log("Click");
+                                    if (_key.currentState!.validate()) {
                                       _key.currentState!.save();
                                       ActionProvider.startLoading(index: 2);
+                                      log("enter");
                                       final String imageUrl;
-                                      if(imageProvider.pickedImage !=null){
+                                      if (imageProvider.pickedImage != null) {
                                         imageUrl = await imageProvider.firebaseStorageImage(image: imageProvider.pickedImage!);
-                                      }else{
-                                        imageUrl = '';
+                                      } else {
+                                        imageUrl = regP.student.profileImage;
                                       }
 
-
-                                      final _students = RegistrationFormModel(
-                                        timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-                                        formId: formProvider.formID.toString(),
-                                        registrationNumber: regP.registrationController.text,
+                                      final _updatedStudent = regP.student.copyWith(
                                         name: regP.nameController.text,
                                         status: dropDownProvider.selectedStatus,
                                         fatherName: regP.fatherNameController.text,
@@ -408,54 +510,51 @@ class AdmissionFormScreen extends StatelessWidget {
                                         contactNumber: regP.contactNumberController.text,
                                         whatsappNumber: regP.whatsappNumberController.text,
                                         residenceNumber: regP.residenceNumberController.text,
-                                        dailyTest: regP.dailyTestController.text,
-                                        servicesFee: regP.servicesChargesController.text,
-                                        extraCharges: regP.extraChargesController.text,
+                                        paperFundFee: regP.paperFundFeeController.text,
+                                        admissionFee: regP.admissionFeeController.text,
+                                        overtimeFee: regP.overtimeFeeController.text,
                                         discountCharges: regP.discountController.text,
                                         gender: dropDownProvider.selectedGender.toString(),
                                         className: dropDownProvider.selectedClass.toString(),
                                         groupName: dropDownProvider.selectedGroup.toString(),
                                         feeStatus: dropDownProvider.selectedFeeStatus,
                                         totalDues: regP.totalDues.toString(),
-                                        profileImage: imageUrl.toString(),
-                                        feePlan: dropDownProvider.selectedFeePlan.toString(), fatherOccupation: '',
+                                        profileImage: imageUrl,
+                                        feePlan: dropDownProvider.selectedFeePlan.toString(),
                                       );
-                                      regP.updateStudent(_students);
-                                      await regP.uploadStudentData();
-                                      await formProvider.updateCountValue(formID: int.parse(formProvider.formID.toString()).toString());
+
+                                      log("running");
+                                      regP.updateStudent(_updatedStudent);
+                                      await regP.updateStudentData();
+
                                       ActionProvider.stopLoading(index: 2);
-                                      dropDownProvider.clear();
-                                      RegistrationPdf().generatePDF(context,_students);
                                     }
-
-                                  }, width: 200.0, height: 50.0),
-                                 const SizedBox(width: 10.0,),
-                                  ButtonWidget(
-                                    index: 3,
-                                    text: "Clear",
-                                    width: 200.0,
-                                    height: 50.0,
-                                    onClicked: () async{
-
-                                      dropDownProvider.clear();
-                                      regP.resetAllControllers();
-                                      imageProvider.clear();
-
-                                    },
-                                  ),
-                                  const SizedBox(width: 10.0,),
-                                ],
-                              ),
-                              AppTextWidget(text: "Total Fee: PKR  ${provider.totalDues}", color: Colors.black, fontSize: 18.0),
+                                  },
+                                  width: 200.0,
+                                  height: 50.0,
+                                ),
+                              const SizedBox(width: 10.0,),
+                              if(!isUpdate)
+                                ButtonWidget(
+                                  index: 3,
+                                  text: "Clear",
+                                  width: 200.0,
+                                  height: 50.0,
+                                  onClicked: () async{
+                                    dropDownProvider.clear();
+                                    regP.resetAllControllers();
+                                    imageProvider.clear();
+                                  },
+                                ),
+                              const SizedBox(width: 10.0,),
                             ],
-                          );
-                        },
+                          ),
+                        ],
                       ),
-
-
                     ],
                   ),
-                )
+                ),
+
               ],
             ),
           ),
@@ -463,6 +562,19 @@ class AdmissionFormScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _calculateButton(RegistrationProvider regP){
+    return ButtonWidget(
+        index: 0,
+        text: "Calculate", onClicked: () async{
+      regP.setTotalDues(((int.parse(regP.paperFundFeeController.text) +
+          int.parse(regP.admissionFeeController.text) +
+          int.parse(regP.overtimeFeeController.text) +
+          int.parse(regP.feeController.text)) -
+          int.parse(regP.discountController.text)).toString());
+    }, width: 200.0, height: 50.0);
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -470,7 +582,6 @@ class AdmissionFormScreen extends StatelessWidget {
       firstDate: DateTime(1980),
       lastDate: DateTime(2030),
     );
-
     if (picked != null) {
       Provider.of<PickerProvider>(context, listen: false).selectDate(picked);
     }

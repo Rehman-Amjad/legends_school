@@ -1,1 +1,1 @@
-enum ToastType { success, error }
+enum ToastType { success, error,warning,info }

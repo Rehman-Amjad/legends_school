@@ -1,15 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:legends_schools_admin/config/component/app_text_widget.dart';
-import 'package:legends_schools_admin/config/keys/menu_screen_keys.dart';
-import 'package:legends_schools_admin/constant.dart';
-import 'package:legends_schools_admin/provider/global/global_access_provider.dart';
-import 'package:legends_schools_admin/provider/menu/menu_provider.dart';
 import 'package:legends_schools_admin/screens/admission/view/student_admission_list_widget.dart';
-import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-
-import '../../config/component/button_widget.dart';
 import '../../responsive.dart';
 
 class AdmissionScreen extends StatelessWidget {
@@ -36,7 +28,7 @@ class AdmissionScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 2.w,),
-                const StudentAdmissionListWidget(),
+                 StudentAdmissionListWidget(),
               ]
           ),
         )

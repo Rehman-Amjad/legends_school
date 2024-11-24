@@ -7,7 +7,7 @@ import 'app_text_widget.dart';
 class AppTextField extends StatelessWidget {
   final String hintText;
   final String? labelText;
-  final Color? labelTextColor;
+  final Color? labelTextColor,fillColor,borderColor;
   final double? labelTextSize;
   final FontWeight? labelFontWeight;
   final Widget? suffixIcon;
@@ -23,6 +23,7 @@ class AppTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final bool obscureText;
+  final VoidCallback? press;
   const AppTextField({
     super.key,
     required this.hintText,
@@ -32,6 +33,7 @@ class AppTextField extends StatelessWidget {
     this.onFieldSubmitted,
     this.focusNode,
     this.radius,
+    this.press,
     this.obscureText = false,
     this.keyboardType,
     this.inputFormatters,
@@ -43,6 +45,8 @@ class AppTextField extends StatelessWidget {
     this.labelTextSize,
     this.labelFontWeight,
     this.labelTextColor,
+    this.fillColor,
+    this.borderColor,
   });
 
   @override
@@ -60,6 +64,7 @@ class AppTextField extends StatelessWidget {
           SizedBox(height: 10,),
         ],
         TextFormField(
+          onTap: press,
           maxLines: maxLine ?? 1,
           style: const TextStyle(
             color: Colors.black,
@@ -79,7 +84,7 @@ class AppTextField extends StatelessWidget {
             hintText: hintText,
             filled: true,
             border: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.grey, width: 2),
+              borderSide:  BorderSide(color:borderColor ?? Colors.grey, width: 2),
               borderRadius: BorderRadius.circular(radius ?? 5),
             ),
             disabledBorder: OutlineInputBorder(
@@ -96,9 +101,9 @@ class AppTextField extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius ?? 5),
-              borderSide:  BorderSide(color: Colors.grey),
+              borderSide:  BorderSide(color: borderColor ?? Colors.grey),
             ),
-            fillColor: Colors.white,
+            fillColor: fillColor ??  Colors.white,
             focusColor: Colors.blueGrey,
             hintStyle: const TextStyle(fontSize: 12.0, color: Colors.grey),
           ),

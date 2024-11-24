@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:legends_schools_admin/routes/routes_name.dart';
 import 'package:legends_schools_admin/screens/drawer/drawer_screen.dart';
+import 'package:legends_schools_admin/screens/expense/studentExpense/add_student_expense_screen.dart';
 import 'package:legends_schools_admin/screens/start/login_screen.dart';
 import 'package:legends_schools_admin/screens/start/splash_screen.dart';
 
@@ -10,6 +11,7 @@ class Routes{
     GetPage(name: RoutesName.splash, page: () => const StartScreen()),
     GetPage(name: RoutesName.loginScreen, page: () => const LoginScreen()),
     GetPage(name: RoutesName.drawerScreen, page: () =>  DrawerScreen()),
+    GetPage(name: RoutesName.addStudentExpenseScreen, page: () =>  AddStudentExpenseScreen()),
   ];
 
 }

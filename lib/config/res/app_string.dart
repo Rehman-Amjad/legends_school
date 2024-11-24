@@ -9,6 +9,8 @@ class AppString{
   static const studentSearch = "Student Search";
   static const studentCard = "Student Card";
   static const parentCard = "Parent Card";
+  static const studentPromotion = "Student Promote";
+  static const studentExpense = "Student Daily Expense";
   static const dailyExpense = "Daily Expense";
   static const testMarks = "Test Marks";
   static const addNewTeacher = "Add New Teacher";

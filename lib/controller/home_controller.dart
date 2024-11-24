@@ -2,7 +2,8 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
-import '../utils/web_utils.dart';
+
+import '../config/util/web_utils.dart';
 
 class HomeController extends GetxController {
   Uint8List? pickedImage;

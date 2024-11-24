@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:legends_schools_admin/constant.dart';
 import 'package:legends_schools_admin/screens/dashboard/widget/home_graph_widget.dart';
 import '../../responsive.dart';
 import 'widget/home_profile_widget.dart';
@@ -10,6 +11,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: background,
       body: SafeArea(
         child: Row(
           children: [

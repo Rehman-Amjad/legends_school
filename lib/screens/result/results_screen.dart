@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:legends_schools_admin/config/res/app_assets.dart';
+import 'package:legends_schools_admin/model/fee.dart';
+import 'package:legends_schools_admin/provider/fee_management_provider.dart';
 import 'package:provider/provider.dart';
 import '../../config/component/app_text_widget.dart';
 import '../../config/component/button_widget.dart';
@@ -14,6 +16,7 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resultProvider = Provider.of<ResultProvider>(context);
+    final feeP = Provider.of<FeeManagementProvider>(context);
 
     return Scaffold(
       body: Container(
@@ -48,6 +51,24 @@ class ResultScreen extends StatelessWidget {
                       onClicked: () async{
                         ActionProvider.startLoading();
                         resultProvider.saveResult();
+
+                        // final fee = Fee(
+                        //     amount: 1500,
+                        //     paidAmount: 0,
+                        //     status: "Unpaid",
+                        //     paidDate: DateTime(2024,10,2),
+                        //     pendingDues: 0,
+                        //     previousMonthDues: 0,
+                        //     lateFee: 0,
+                        //     scholarshipDiscount: 0
+                        // );
+                        //
+                        //
+                        // feeP.addFeeAndUpdateMonthlyStatus(
+                        //     "2",
+                        //     fee,
+                        //     "2024-10"
+                        // );
                       }
                     )
                   ],

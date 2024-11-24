@@ -36,7 +36,7 @@ class ActionProvider extends ChangeNotifier{
   }
 
   void setLoading(bool isLoading, {int index = 0}) {
-    _isLoading[0] = isLoading;
+    _isLoading[index] = isLoading;
     notifyListeners();
   }
 
@@ -176,6 +176,33 @@ class ActionProvider extends ChangeNotifier{
     _startDate = dateTimeRange.start;
     _endDate = dateTimeRange.end;
     notifyListeners();  // Notify listeners (UI will be updated)
+  }
+
+  DateTime? _selectedDate;
+
+  DateTime? get selectedDate => _selectedDate;
+
+  void setDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
+
+  String searchValue = '';
+
+  List<String> months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December',
+  ];
+
+  List<String> get filteredMonths {
+    return months
+        .where((month) => month.toLowerCase().contains(searchValue.toLowerCase()))
+        .toList();
+  }
+
+  void updateSearchValue(String value) {
+    searchValue = value;
+    notifyListeners();
   }
 
 }
