@@ -107,6 +107,7 @@ class StudentAdmissionListWidget extends StatelessWidget {
       DataColumn(label: _buildHeader("Class")),
       DataColumn(label: _buildHeader("Contact#")),
       // DataColumn(label: _buildHeader("Address")),
+      if(UIType.Expense != type)
       DataColumn(label: _buildHeader("Status")),
       DataColumn(label: _buildHeader("Action")),
     ];
@@ -149,13 +150,11 @@ class DataTableSourceImpl extends DataTableSource {
         DataCell(AppTextWidget(text: student.className, color: Colors.black)),
         DataCell(AppTextWidget(text: student.contactNumber, color: Colors.black)),
         // DataCell(AppTextWidget(text: student.address, color: Colors.black)),
+        if(UIType.Expense != type)
         DataCell(
             Container(
               width: 80.0,
               height: 30,
-              // padding:const EdgeInsets.symmetric(
-              //   vertical: 10.0
-              // ),
               decoration:  BoxDecoration(
                 color:  student.status == "ACTIVE" ? Colors.green : Colors.red,
                 borderRadius: BorderRadius.circular(8),

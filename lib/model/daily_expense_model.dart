@@ -5,6 +5,7 @@ class DailyExpenseModel {
   final String description;
   final String category;
   final String paymentMethod;
+  final String monthYear;
 
   DailyExpenseModel({
     required this.timeStamp,
@@ -12,6 +13,7 @@ class DailyExpenseModel {
     required this.description,
     required this.category,
     required this.paymentMethod,
+    required this.monthYear,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +23,7 @@ class DailyExpenseModel {
       'description': description,
       'category': category,
       'paymentMethod': paymentMethod,
+      'monthYear': monthYear,
     };
   }
 
@@ -31,6 +34,7 @@ class DailyExpenseModel {
       description: map['description'] ?? "",
       category: map['category'] ?? "",
       paymentMethod: map['paymentMethod'] ?? "",
+      monthYear: map['monthYear'] ?? "",
     );
   }
 }

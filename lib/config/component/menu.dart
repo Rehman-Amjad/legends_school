@@ -35,7 +35,7 @@ class Menu extends StatelessWidget {
         icon: 'assets/svg/profile.svg',
         title: "Fee",
         subItems: [
-          MenuModel(icon: 'assets/svg/profile.svg', title: AppString.feeStructure),
+          // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.feeStructure),
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.feeSlip),
         ],
       ),
@@ -45,8 +45,9 @@ class Menu extends StatelessWidget {
         subItems: [
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentSearch),
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentCard),
-          MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentPromotion),
+          // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentPromotion),
           MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentExpense),
+          MenuModel(icon: 'assets/svg/profile.svg', title: AppString.studentDiary),
           // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.dailyExpense),
           // MenuModel(icon: 'assets/svg/profile.svg', title: AppString.testMarks),
         ],

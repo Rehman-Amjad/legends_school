@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:legends_schools_admin/screens/admission/admission_form_screen.dart';
 import 'package:legends_schools_admin/screens/admission/admission_screen.dart';
 import 'package:legends_schools_admin/screens/cards/student_card_serach.dart';
+import 'package:legends_schools_admin/screens/diary/student_diary_screen.dart';
 import 'package:legends_schools_admin/screens/expense/studentExpense/student_daily_expense.dart';
 import 'package:legends_schools_admin/screens/fees/fee_status_list_screen.dart';
 import 'package:legends_schools_admin/screens/teacher/teacher_register.dart';
@@ -116,6 +117,9 @@ class MenuProvider extends ChangeNotifier {
             break;
           case AppString.studentExpense:
             _cachedSelectedScreen = const StudentDailyExpense();
+            break;
+          case AppString.studentDiary:
+            _cachedSelectedScreen = const StudentDiaryScreen();
             break;
         }
       } else {

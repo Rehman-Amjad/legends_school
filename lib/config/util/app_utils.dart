@@ -111,4 +111,15 @@ class AppUtils{
     );
   }
 
+  int? monthNameToNumber(String monthName) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    final index = months.indexWhere(
+          (month) => month.toLowerCase() == monthName.toLowerCase().trim(),
+    );
+    return index != -1 ? index + 1 : null; // Return null if the month name is invalid
+  }
+
 }

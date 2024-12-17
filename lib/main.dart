@@ -5,6 +5,7 @@ import 'package:legends_schools_admin/provider/constant/action_provider.dart';
 import 'package:legends_schools_admin/provider/constant/drop_down_provider.dart';
 import 'package:legends_schools_admin/provider/constant/picker_provider.dart';
 import 'package:legends_schools_admin/provider/constant/result_provider.dart';
+import 'package:legends_schools_admin/provider/diary/diary_provider.dart';
 import 'package:legends_schools_admin/provider/expense/daily_expense_provider.dart';
 import 'package:legends_schools_admin/provider/fee_management_provider.dart';
 import 'package:legends_schools_admin/provider/menu/menu_provider.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
            ChangeNotifierProvider(create: (_) => DailyExpenseProvider()),
            ChangeNotifierProvider(create: (_) => FeeManagementProvider()),
            ChangeNotifierProvider(create: (_) => PaginationProvider()),
+           ChangeNotifierProvider(create: (_) => DiaryProvider()),
         ],
         child: ShadApp.custom(
           appBuilder:(context, theme) => GetMaterialApp(

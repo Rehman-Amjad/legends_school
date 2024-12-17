@@ -8,6 +8,8 @@ import 'package:legends_schools_admin/config/component/app_text_field.dart';
 import 'package:legends_schools_admin/config/component/app_text_widget.dart';
 import 'package:legends_schools_admin/config/component/button_widget.dart';
 import 'package:legends_schools_admin/config/component/custom_richtext.dart';
+import 'package:legends_schools_admin/config/component/search_calender_dropdpwn.dart';
+import 'package:legends_schools_admin/config/util/time_utils.dart';
 import 'package:legends_schools_admin/constant.dart';
 import 'package:legends_schools_admin/model/daily_expense_model.dart';
 import 'package:legends_schools_admin/model/registration_form_model.dart';
@@ -245,7 +247,8 @@ class AddStudentExpenseScreen extends StatelessWidget {
                     amount: double.parse(feeP.amountController.text),
                     description: feeP.noteController.text,
                     category: dropP.selectedExpense,
-                    paymentMethod: "none"
+                    paymentMethod: "none",
+                    monthYear: TimeUtils().getMonthYearFromTimestamp()
                 );
                await feeP.addExpense(model.formId, expense);
                 AppUtils().showWebToast(
@@ -277,7 +280,9 @@ class AddStudentExpenseScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
          const SizedBox(height: 20,),
-          StudentExpenseListWidget(formID: model.formId,),
+         const SearchCalenderDropdown(),
+         const SizedBox(height: 20,),
+          StudentExpenseListWidget(formID: model.formId),
         ],
       ),
     );

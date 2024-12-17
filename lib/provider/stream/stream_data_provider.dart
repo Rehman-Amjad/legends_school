@@ -4,9 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:legends_schools_admin/model/daily_expense_model.dart';
 import 'package:legends_schools_admin/model/fee/fee_status_model.dart';
+import 'package:legends_schools_admin/model/fee/student_fee_model.dart';
 import 'package:legends_schools_admin/model/registration_form_model.dart';
 
 import '../../config/keys/db_key.dart';
+import '../../model/fee.dart';
 import '../../model/teacher_model.dart';
 
 class StreamDataProvider extends ChangeNotifier{
@@ -42,10 +44,10 @@ class StreamDataProvider extends ChangeNotifier{
     });
   }
 
-  Stream<List<FeeStatusModel>> getMonthlyStudentFeeStatus({int? limit}) {
+  Stream<List<FeeStatusModel>> getMonthlyStudentFeeStatus({int? limit,required String monthYear}) {
     Query feeStatusQuery = firestore
         .collection(DbKey.monthlyFeeStatus)
-        .doc("2024-11")
+        .doc(monthYear)
         .collection(DbKey.admissions);
 
     if (limit != null) {
@@ -83,15 +85,19 @@ class StreamDataProvider extends ChangeNotifier{
 
   Stream<Map<String, dynamic>> getStudentExpense({
     int? limit,
-    String? month, // Expected in "MM" format (e.g., "11" for November)
-    String? year,  // Expected in "yyyy" format (e.g., "2024")
+    String? monthYear, // Expected in "YYYY-MM" format
     String? category, // Specific category filter
     required String formId,
   }) {
-
     DateTime now = DateTime.now();
-    String defaultMonth = month ?? now.month.toString().padLeft(2, '0'); // "MM"
-    String defaultYear = year ?? now.year.toString();                    // "yyyy"
+
+    // Extract year and month from the `monthYear` parameter
+    String defaultMonthYear = monthYear ?? "${now.year}-${now.month.toString().padLeft(2, '0')}";
+
+    // Split the "YYYY-MM" format into year and month components
+    List<String> parts = defaultMonthYear.split("-");
+    int year = int.parse(parts[0]);
+    int month = int.parse(parts[1]);
 
     // Build the query dynamically
     Query query = firestore
@@ -103,8 +109,8 @@ class StreamDataProvider extends ChangeNotifier{
     query = query.where(
       "timeStamp",
       isGreaterThanOrEqualTo: DateTime(
-        int.parse(defaultYear),
-        int.parse(defaultMonth),
+        year,
+        month,
         1,
       ).millisecondsSinceEpoch.toString(), // Convert milliseconds to string
     );
@@ -112,8 +118,8 @@ class StreamDataProvider extends ChangeNotifier{
     query = query.where(
       "timeStamp",
       isLessThan: DateTime(
-        int.parse(defaultYear),
-        int.parse(defaultMonth) + 1,
+        year,
+        month + 1,
         1,
       ).millisecondsSinceEpoch.toString(), // Convert milliseconds to string
     );
@@ -144,6 +150,21 @@ class StreamDataProvider extends ChangeNotifier{
     });
   }
 
+
+  Stream<List<StudentFeeModel>> getSingleStudentFee({int? limit,String? monthYear, required String formID}) {
+    Query query = firestore
+        .collection(DbKey.admissions)
+        .doc(formID)
+        .collection('fees');
+    if (limit != null) {
+      query = query.limit(limit);
+    }
+    return query.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return StudentFeeModel.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
 
 
 

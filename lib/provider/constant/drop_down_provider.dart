@@ -1,6 +1,76 @@
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class DropdownProvider extends ChangeNotifier{
+
+  final List<String> _months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
+  String? _selectedMonth;
+  String _selectedYear;
+  final List<String> _years;
+
+  DropdownProvider()
+      : _selectedMonth = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ][DateTime.now().month - 1],
+        _years = List.generate(
+          50,
+              (index) => (DateTime.now().year - 25 + index).toString(),
+        ),
+        _selectedYear = DateTime.now().year.toString();
+
+  List<String> get months => _months;
+  List<String> get years => _years;
+
+  String? get selectedMonth => _selectedMonth;
+  String get selectedYear => _selectedYear;
+
+  void updateSelectedMonth(String month) {
+    _selectedMonth = month;
+    notifyListeners();
+  }
+
+  void updateSelectedYear(String year) {
+    _selectedYear = year;
+    notifyListeners();
+  }
+
+  String get formattedDate {
+    final monthIndex = _months.indexOf(_selectedMonth!) + 1;
+    final formattedMonth = monthIndex.toString().padLeft(2, '0');
+    return "$_selectedYear-$formattedMonth";
+  }
+
+  void reset() {
+    // Reset to current month and year
+    _selectedMonth = _months[DateTime.now().month - 1];
+    _selectedYear = DateTime.now().year.toString();
+    notifyListeners();
+  }
 
   // Fee Status
   String _selectedFeeStatus = 'Select Fee Status';
@@ -76,6 +146,7 @@ class DropdownProvider extends ChangeNotifier{
     _selectedClass = value;
   }
 
+
   void changeClass(String studentClass){
     _selectedClass = studentClass;
     notifyListeners();
@@ -135,6 +206,21 @@ class DropdownProvider extends ChangeNotifier{
 
 
 
+
+
+  DateTime _selectedDate = DateTime.now();
+
+  // Getter for formatted month-year
+  String get selectedMonthYear => DateFormat('yyyy-MM').format(_selectedDate);
+
+  // Update the selected date
+  void updateSelectedDate(DateTime newDate) {
+    _selectedDate = newDate;
+    notifyListeners();
+  }
+
+
+
   void clear(){
     _selectedClass = 'Select Class';
     _selectedGroup = 'Select Occupation';
@@ -143,5 +229,9 @@ class DropdownProvider extends ChangeNotifier{
     _selectedFeeStatus  = 'Select Fee Status';
     notifyListeners();
   }
+
+
+
+
 
 }

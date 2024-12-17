@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -187,21 +189,37 @@ class ActionProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  String searchValue = '';
 
   List<String> months = [
     'January', 'February', 'March', 'April', 'May', 'June', 'July',
     'August', 'September', 'October', 'November', 'December',
   ];
 
-  List<String> get filteredMonths {
-    return months
-        .where((month) => month.toLowerCase().contains(searchValue.toLowerCase()))
-        .toList();
+  List<String> filteredMonths = [];
+  String _selectedMonth = '';
+  String searchValue = '';
+
+  String get selectedMonth => _selectedMonth;
+
+  void initialize() {
+    final now = DateTime.now();
+    _selectedMonth = months[now.month - 1]; // Default to the current month
+    filteredMonths = List.from(months);
+    notifyListeners();
   }
 
   void updateSearchValue(String value) {
     searchValue = value;
+    filteredMonths = months
+        .where((month) =>
+        month.toLowerCase().contains(value.toLowerCase().trim()))
+        .toList();
+    notifyListeners();
+  }
+
+  void updateSelectedMonth(String month) {
+    log("message $month");
+    _selectedMonth = month;
     notifyListeners();
   }
 

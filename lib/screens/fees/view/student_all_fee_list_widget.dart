@@ -5,12 +5,11 @@ import 'package:legends_schools_admin/config/component/custom_richtext.dart';
 import 'package:legends_schools_admin/config/enum/form_type.dart';
 import 'package:legends_schools_admin/config/enum/toast_type.dart';
 import 'package:legends_schools_admin/config/keys/db_key.dart';
-import 'package:legends_schools_admin/config/services/expense_services.dart';
 import 'package:legends_schools_admin/config/util/app_utils.dart';
 import 'package:legends_schools_admin/config/util/time_utils.dart';
 import 'package:legends_schools_admin/config/util/web_utils.dart';
 import 'package:legends_schools_admin/model/daily_expense_model.dart';
-import 'package:legends_schools_admin/provider/constant/drop_down_provider.dart';
+import 'package:legends_schools_admin/model/fee/student_fee_model.dart';
 import 'package:legends_schools_admin/provider/pagination/pagination_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -19,29 +18,22 @@ import '../../../../constant.dart';
 import '../../../../provider/registration/registration_provider.dart';
 import '../../../../provider/stream/stream_data_provider.dart';
 import '../../../../responsive.dart';
+import '../../../model/fee.dart';
 
-class StudentExpenseListWidget extends StatelessWidget {
+class StudentAllFeeListWidget extends StatelessWidget {
   final UIType type;
   String? status,formID;
-  bool isSearch;
-  StudentExpenseListWidget({super.key,this.type = UIType.List,this.status,required this.formID,this.isSearch = true});
+  StudentAllFeeListWidget({super.key,this.type = UIType.List,this.status,required this.formID});
 
   @override
   Widget build(BuildContext context) {
     log("message");
     final provider = Provider.of<StreamDataProvider>(context, listen: false);
-    final searchProvider = Provider.of<RegistrationProvider>(context);
-    final drop = Provider.of<DropdownProvider>(context);
     return Column(
       children: [
-        if(isSearch)...[
-          _SearchField(),
-          const SizedBox(height: 10.0,),
-        ],
-        StreamBuilder<Map<String, dynamic>>(
-          stream: provider.getStudentExpense(monthYear: drop.formattedDate, formId: formID ?? "0"),
+        StreamBuilder<List<StudentFeeModel>>(
+          stream: provider.getSingleStudentFee(formID: formID ?? "0"),
           builder: (context, snapshot) {
-
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                 child: CircularProgressIndicator(color: primaryColor),
@@ -53,65 +45,10 @@ class StudentExpenseListWidget extends StatelessWidget {
                   style: const TextStyle(color: Colors.red),
                 ),
               );
-            } else if (snapshot.hasData) {
-              final data = snapshot.data;
-              if (data != null && data.isNotEmpty) {
-                final expenses = data['expenses'] as List<DailyExpenseModel>;
-                final totalAmount = data['totalAmount'] as double;
-
-                if (expenses.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "No expense history of this month",
-                      style: TextStyle(
-                        fontSize: Responsive.isMobile(context) ? 12.0 : 18.0,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                }
-
-                final filteredExpenses = searchProvider.filterExpenses(expenses);
-
-                return Consumer<PaginationProvider>(
-                  builder: (context, provider, child){
-                    final paginatedData = provider.getPaginatedData(filteredExpenses);
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Align(
-                              alignment: AlignmentDirectional.centerEnd,
-                              child: CustomRichText(
-                                firstText: "Total Amount: ",
-                                secondText: WebUtils().formatCurrency(totalAmount),
-                                secondWeight: FontWeight.bold,
-                              )
-                          ),
-                        ),
-                        _ExpenseTable(expenses: paginatedData,formID: formID ?? "0",),
-                        _PaginationControls(totalItems: filteredExpenses.length),
-                      ],
-                    );
-                  },
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    "No expense history of this month",
-                    style: TextStyle(
-                      fontSize: Responsive.isMobile(context) ? 12.0 : 18.0,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              }
-            } else {
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
                 child: Text(
-                  "No expense history of this month",
+                  "No fee record found",
                   style: TextStyle(
                     fontSize: Responsive.isMobile(context) ? 12.0 : 18.0,
                     color: Colors.black,
@@ -120,6 +57,19 @@ class StudentExpenseListWidget extends StatelessWidget {
                 ),
               );
             }
+            List<StudentFeeModel> admissions = snapshot.data!;
+
+            return Consumer<PaginationProvider>(
+              builder: (context, provider, child){
+                final paginatedData = provider.getSingleStudentPaginatedData(admissions);
+                return Column(
+                  children: [
+                    _ExpenseTable(expenses: paginatedData,formID: formID ?? "0",),
+                    _PaginationControls(totalItems: paginatedData.length),
+                  ],
+                );
+              },
+            );
           },
         )
 
@@ -130,7 +80,7 @@ class StudentExpenseListWidget extends StatelessWidget {
 
 
 class _ExpenseTable extends StatelessWidget {
-  final List<DailyExpenseModel> expenses;
+  final List<StudentFeeModel> expenses;
   final String formID;
 
   const _ExpenseTable({required this.expenses, required this.formID});
@@ -148,9 +98,11 @@ class _ExpenseTable extends StatelessWidget {
         columnWidths: const {
           0: FractionColumnWidth(0.2),
           1: FractionColumnWidth(0.1),
-          2: FractionColumnWidth(0.4),
-          3: FractionColumnWidth(0.2),
+          2: FractionColumnWidth(0.1),
+          3: FractionColumnWidth(0.1),
           4: FractionColumnWidth(0.1),
+          5: FractionColumnWidth(0.1),
+          6: FractionColumnWidth(0.1),
           // 4: FractionColumnWidth(0.2)
         },
         children: [
@@ -167,22 +119,26 @@ class _ExpenseTable extends StatelessWidget {
       children: [
         _buildHeader("Date"),
         _buildHeader("Amount"),
-        _buildHeader("Description"),
-        _buildHeader("Category"),
-        _buildHeader("Action"),
+        _buildHeader("Late Fee"),
+        _buildHeader("Daily Expense"),
+        _buildHeader("Paid Amount"),
+        _buildHeader("Pending Dues"),
+        _buildHeader("Status"),
       ],
     );
   }
 
-  TableRow _buildTableRow(DailyExpenseModel expense) {
+  TableRow _buildTableRow(StudentFeeModel fees) {
     return TableRow(
       decoration: const BoxDecoration(color: Colors.white),
       children: [
-        _buildCell(TimeUtils().formatTimestamp(expense.timeStamp)),
-        _buildCell(WebUtils().formatCurrency(expense.amount)),
-        _buildCell(expense.description),
-        _buildCell(expense.category),
-        _buildActionCell(expense)
+        _buildCell(fees.monthYear.toString()),
+        _buildCell(WebUtils().formatCurrency(fees.amount)),
+        _buildCell(WebUtils().formatCurrency(fees.lateFee)),
+        _buildCell(WebUtils().formatCurrency(fees.dailyExpense)),
+        _buildCell(WebUtils().formatCurrency(fees.paidAmount)),
+        _buildCell(WebUtils().formatCurrency(fees.pendingDues)),
+        _buildCell(fees.status.toString()),
       ],
     );
   }
@@ -206,28 +162,6 @@ class _ExpenseTable extends StatelessWidget {
     );
   }
 
-  Widget _buildActionCell(DailyExpenseModel expense) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: InkWell(
-        onTap: () async{
-          // Add the delete action here
-         await  FirebaseFirestore.instance.collection(DbKey.admissions)
-              .doc(formID).collection(DbKey.dailyExpenses)
-              .doc(expense.timeStamp).delete();
-
-         final ExpenseService expenseService = ExpenseService();
-
-        await expenseService.deleteExpense(formID, expense.monthYear, expense.amount);
-         AppUtils().showWebToast(
-           text: "Expense deleted",
-           toastType: ToastType.success
-         );
-          
-        },
-        child: Icon(Icons.delete,color: Colors.red,)),
-    );
-  }
 
 
 }
@@ -241,25 +175,25 @@ class _PaginationControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final paginationProvider = Provider.of<PaginationProvider>(context);
 
-    final totalPages = (totalItems / paginationProvider.itemsPerPage).ceil();
+    final totalPages = (totalItems / paginationProvider.itemsSingleStudentPerPage).ceil();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         IconButton(
-          onPressed: paginationProvider.currentPage > 1
-              ? () => paginationProvider.goToPreviousPage()
+          onPressed: paginationProvider.singleStudentPage > 1
+              ? () => paginationProvider.singleStudentPreviousPage()
               : null,
           icon: const Icon(Icons.chevron_left),
           color: primaryColor,
         ),
         Text(
-          "Page ${paginationProvider.currentPage} of $totalPages",
+          "Page ${paginationProvider.singleStudentPage} of $totalPages",
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         IconButton(
-          onPressed: paginationProvider.currentPage < totalPages
-              ? () => paginationProvider.goToNextPage(totalItems)
+          onPressed: paginationProvider.singleStudentPage < totalPages
+              ? () => paginationProvider.singleStudentNextPage(totalItems)
               : null,
           icon: const Icon(Icons.chevron_right),
           color: primaryColor,

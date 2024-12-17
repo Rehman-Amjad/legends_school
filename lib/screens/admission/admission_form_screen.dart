@@ -384,6 +384,7 @@ class AdmissionFormScreen extends StatelessWidget {
                                     nationality: regP.nationalityController.text.toString(),
                                     medicalCondition: regP.medicalConditionController.text.toString(),
                                     address: regP.addressController.text.toString(),
+                                    appPassword: "12345",
                                     schoolName: regP.schoolNameController.text.toString(),
                                     referenceName: regP.studentReferenceController.text.toString(),
                                     pdfImageUrl: regP.imageURLController.text.toString(),
@@ -463,6 +464,7 @@ class AdmissionFormScreen extends StatelessWidget {
                                       feeStatus: dropDownProvider.selectedFeeStatus,
                                       totalDues: regP.totalDues.toString(),
                                       profileImage: imageUrl.toString(),
+                                      appPassword: "12345",
                                       feePlan: dropDownProvider.selectedFeePlan.toString(), fatherOccupation: '',
                                     );
 

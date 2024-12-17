@@ -20,6 +20,7 @@ class AppString{
   static const assignClasses = "Assign Classes";
   static const studentAttendance = "Student Attendance";
   static const teacherAttendance = "Teacher Attendance";
+  static const studentDiary = "Student Diary";
 
 
   static const signatureText = "Declaration: I ........................hereby certify to the best of my knowledge that the above information is ture and accurate.";

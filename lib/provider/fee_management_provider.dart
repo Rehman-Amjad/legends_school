@@ -2,11 +2,15 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:legends_schools_admin/config/enum/toast_type.dart';
 import 'package:legends_schools_admin/config/keys/db_key.dart';
+import 'package:legends_schools_admin/config/util/app_utils.dart';
 import 'package:legends_schools_admin/model/daily_expense_model.dart';
+import 'package:legends_schools_admin/model/fee/fee_status_model.dart';
 import 'package:legends_schools_admin/model/registration_form_model.dart';
 import 'package:legends_schools_admin/config/util/time_utils.dart';
 
+import '../config/enum/fee_type.dart';
 import '../model/fee.dart';
 import '../model/fee/monthly_fee_status.dart';
 
@@ -17,6 +21,17 @@ class FeeManagementProvider with ChangeNotifier {
   final amountController = TextEditingController();
   final noteController = TextEditingController();
 
+
+  FeeStatusModel? _feeStatusModel;
+
+
+  FeeStatusModel? get feeStatusModel => _feeStatusModel;
+
+
+  void updateFeeStatusModel(FeeStatusModel model){
+    _feeStatusModel = model;
+    notifyListeners();
+  }
 
 
   // Fetch a student by studentId
@@ -63,49 +78,35 @@ class FeeManagementProvider with ChangeNotifier {
   }
 
 
-  // Fetch all fees for a student for a specific month
-  Future<List<Fee>> fetchFees(String studentId, String monthYear) async {
-    QuerySnapshot feesSnapshot = await _firestore
-        .collection('students')
-        .doc(studentId)
-        .collection('fees')
-        .where('monthYear', isEqualTo: monthYear)
-        .get();
+  // // Fetch daily expenses for a student
+  // Future<List<DailyExpenseModel>> fetchExpenses(String studentId) async {
+  //   QuerySnapshot expenseSnapshot = await _firestore
+  //       .collection('students')
+  //       .doc(studentId)
+  //       .collection('dailyExpenses')
+  //       .get();
+  //
+  //   return expenseSnapshot.docs
+  //       .map((doc) => DailyExpenseModel.fromMap(doc.data() as Map<String, dynamic>))
+  //       .toList();
+  // }
 
-    return feesSnapshot.docs
-        .map((doc) => Fee.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  }
+  // // Fetch monthly fee status for a specific month
+  // Future<Map<String, dynamic>> fetchMonthlyFeeStatus(String monthYear) async {
+  //   DocumentSnapshot statusDoc =
+  //   await _firestore.collection('monthlyFeesStatus').doc(monthYear).get();
+  //   return statusDoc.data() as Map<String, dynamic>;
+  // }
 
-  // Fetch daily expenses for a student
-  Future<List<DailyExpenseModel>> fetchExpenses(String studentId) async {
-    QuerySnapshot expenseSnapshot = await _firestore
-        .collection('students')
-        .doc(studentId)
-        .collection('dailyExpenses')
-        .get();
-
-    return expenseSnapshot.docs
-        .map((doc) => DailyExpenseModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
-  }
-
-  // Fetch monthly fee status for a specific month
-  Future<Map<String, dynamic>> fetchMonthlyFeeStatus(String monthYear) async {
-    DocumentSnapshot statusDoc =
-    await _firestore.collection('monthlyFeesStatus').doc(monthYear).get();
-    return statusDoc.data() as Map<String, dynamic>;
-  }
-
-  // Add a fee to a student's fees collection
-  Future<void> addFee(String studentId, Fee fee) async {
-    await _firestore
-        .collection('students')
-        .doc(studentId)
-        .collection('fees')
-        .add(fee.toMap());
-    notifyListeners();
-  }
+  // // Add a fee to a student's fees collection
+  // Future<void> addFee(String studentId, Fee fee) async {
+  //   await _firestore
+  //       .collection('students')
+  //       .doc(studentId)
+  //       .collection('fees')
+  //       .add(fee.toMap());
+  //   notifyListeners();
+  // }
 
   // Add an expense to a student's dailyExpenses collection
   Future<void> addExpense(String studentId, DailyExpenseModel expense) async {
@@ -115,8 +116,47 @@ class FeeManagementProvider with ChangeNotifier {
         .collection('dailyExpenses')
         .doc(expense.timeStamp)
         .set(expense.toMap());
-        notifyListeners();
+
+    log("Month: ${expense.monthYear}");
+    await updateFeesWithTransaction(studentId,expense.monthYear,expense.amount);
   }
+
+  Future<void> updateFeesWithTransaction(String studentId, String date, double newAmount) async {
+    final feesDocRef = _firestore
+        .collection('students')
+        .doc(studentId)
+        .collection('fees')
+        .doc(date);
+
+    try {
+      await _firestore.runTransaction((transaction) async {
+        DocumentSnapshot feesSnapshot = await transaction.get(feesDocRef);
+
+        if (!feesSnapshot.exists) {
+          transaction.set(feesDocRef, {
+            'dailyExpense': newAmount,
+          });
+        } else {
+          // If the document exists, update the dailyExpense by adding the newAmount
+          double currentDailyExpense = feesSnapshot.get('dailyExpense') ?? 0.0;
+          double updatedDailyExpense = currentDailyExpense + newAmount;
+          transaction.update(feesDocRef, {
+            'dailyExpense': updatedDailyExpense,
+          });
+        }
+      });
+      log('Fees updated successfully');
+    } catch (e) {
+      // Catch any errors during the transaction and log the error
+      log('Error updating fees: $e');
+      // You can also show a custom error message to the user here
+    }
+  }
+
+
+
+
+
 
   // Update the monthly fee status for all students
   Future<void> updateMonthlyFeeStatus(String monthYear, double totalAmount,
@@ -131,7 +171,7 @@ class FeeManagementProvider with ChangeNotifier {
 
 
   Future<void> addFeeAndUpdateMonthlyStatus(
-      {required String studentId, required Fee feeModel,required String monthYear}) async {
+      {required String studentId, required StudentFeeModel feeModel,required String monthYear}) async {
     final studentRef = FirebaseFirestore.instance.collection('students').doc(studentId);
     final feeRef = studentRef.collection('fees').doc(monthYear);
     final monthlyFeeRef = FirebaseFirestore.instance.collection('monthlyFeesStatus').doc(monthYear).collection('students').doc(studentId);
@@ -172,7 +212,7 @@ class FeeManagementProvider with ChangeNotifier {
         'id': studentId,
         'status': feeModel.status,
         'amount': feeModel.amount,
-        'paidDate': feeModel.status == 'Paid' ? feeModel.paidDate : null,
+        'paidDate': feeModel.status == 'Paid' ? feeModel.paidDate : "",
         'previousMonthDues': feeModel.previousMonthDues,
       });
 
@@ -189,7 +229,6 @@ class FeeManagementProvider with ChangeNotifier {
     final monthlyFeeRef = FirebaseFirestore.instance.collection('monthlyFeesStatus').doc(monthYear).collection('students').doc(studentId);
 
     try {
-      // Retrieve the student's fee information for the given month
       final feeDoc = await feeRef.get();
       if (!feeDoc.exists) {
         log('No fee record found for the student in the specified month.');
@@ -255,7 +294,7 @@ class FeeManagementProvider with ChangeNotifier {
     // Fetch current fee status for the student
     final feeDoc = await feeRef.get();
     if (feeDoc.exists) {
-      final currentFee = Fee.fromMap(feeDoc.data()!);  // assuming Fee.fromMap() method is implemented
+      final currentFee = StudentFeeModel.fromMap(feeDoc.data()!);  // assuming Fee.fromMap() method is implemented
 
       if (currentFee.status == 'Unpaid') {
         // Update fee document to "Paid"
@@ -358,6 +397,64 @@ class FeeManagementProvider with ChangeNotifier {
       });
     } catch (e) {
       print("Error updating total fee amounts: $e");
+    }
+  }
+
+
+  bool _isLoading  = false;
+  bool get isLoading => _isLoading;
+
+  Future<void> saveUnpaidFeesForActiveStudents() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      DateTime now = DateTime.now();
+      String currentMonthYear = "${now.year}-${now.month.toString().padLeft(2, '0')}";
+
+      QuerySnapshot studentSnapshot = await FirebaseFirestore.instance
+          .collection(DbKey.admissions)
+          .where('status', isEqualTo: "ACTIVE") // Filter active students
+          .get();
+
+      if (studentSnapshot.docs.isEmpty) {
+        log("No active students found.");
+        return;
+      }
+
+      for (QueryDocumentSnapshot doc in studentSnapshot.docs) {
+        Map<String, dynamic> studentData = doc.data() as Map<String, dynamic>;
+
+        String formId = studentData['formID'];
+        String totalDues = studentData['totalDues'] ?? 0.0;
+
+        final fee = StudentFeeModel(
+          amount: double.parse(totalDues),
+          status: FeeType.Unpaid.name,
+          paidAmount: 0,
+          paidDate: DateTime.now(),
+          pendingDues: 0.0,
+          previousMonthDues: 0.0,
+          lateFee: 0.0,
+          dailyExpense: 0.0,
+          timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+          monthYear: TimeUtils().getMonthYearFromTimestamp(),
+          scholarshipDiscount: 0.0,
+        );
+
+        await addFeeAndUpdateMonthlyStatus(
+            studentId: formId,
+            feeModel: fee,
+            monthYear: currentMonthYear
+        );
+        log("Unpaid fee data saved for FormID: $formId");
+      }
+    } catch (e) {
+      log("Error saving unpaid fees: $e");
+    }finally {
+      AppUtils().showWebToast(text: "Student Fee Updated",toastType: ToastType.success);
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

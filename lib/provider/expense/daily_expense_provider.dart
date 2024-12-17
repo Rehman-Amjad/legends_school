@@ -51,7 +51,7 @@ class DailyExpenseProvider with ChangeNotifier {
   //   }
   // }
 
-  Future<List<Fee>> getFeesForMonth(String studentId, String monthYear) async {
+  Future<List<StudentFeeModel>> getFeesForMonth(String studentId, String monthYear) async {
     try {
       final feeSnapshot = await FirebaseFirestore.instance
           .collection('students')
@@ -60,7 +60,7 @@ class DailyExpenseProvider with ChangeNotifier {
           .where('monthYear', isEqualTo: monthYear)
           .get();
       return feeSnapshot.docs
-          .map((doc) => Fee.fromMap(doc.data()))
+          .map((doc) => StudentFeeModel.fromMap(doc.data()))
           .toList();
     } catch (e) {
       log("Error fetching fees: $e");

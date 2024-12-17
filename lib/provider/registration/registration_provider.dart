@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:legends_schools_admin/model/daily_expense_model.dart';
+import 'package:legends_schools_admin/model/diary/diary_model.dart';
 import 'package:legends_schools_admin/provider/constant/drop_down_provider.dart';
 import 'package:legends_schools_admin/provider/fee_management_provider.dart';
 import 'package:legends_schools_admin/config/util/time_utils.dart';
@@ -62,6 +63,7 @@ class RegistrationProvider extends ChangeNotifier{
     religion: '',
     nationality: '',
     medicalCondition: '',
+    appPassword: '',
     address: '',
     schoolName: '',
     fatherOccupation: '',
@@ -115,14 +117,17 @@ class RegistrationProvider extends ChangeNotifier{
       AppUtils().showToast(text: "Student Registered Successfully");
     });
 
-    final fee = Fee(
+    final fee = StudentFeeModel(
       amount: double.parse(_student.totalDues),
       status: _student.feeStatus == "PAID" ? FeeType.Paid.name : FeeType.Unpaid.name,
       paidAmount: 0,
-      paidDate: DateTime(2024, 1, 15),
+      paidDate: DateTime.now(),
       pendingDues: 0.0,
       previousMonthDues: 0.0,
       lateFee: 0.0,
+      dailyExpense: 0.0,
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      monthYear: TimeUtils().getMonthYearFromTimestamp(),
       scholarshipDiscount: 0.0,
     );
 
@@ -134,7 +139,7 @@ class RegistrationProvider extends ChangeNotifier{
 
   }
 
-  Future<void> addFee(String studentId, Fee fee) async {
+  Future<void> addFee(String studentId, StudentFeeModel fee) async {
     await firestore
         .collection('students')
         .doc(studentId)
@@ -262,6 +267,7 @@ class RegistrationProvider extends ChangeNotifier{
     registrationController.text = "";
     imageURLController.text = "";
     feeController.text = "";
+    _searchTerm = "";
   }
 
   // search filder
@@ -283,9 +289,18 @@ class RegistrationProvider extends ChangeNotifier{
     return expenses.where((expense) {
       return expense.description.toLowerCase().contains(_searchTerm) ||
           expense.paymentMethod.toLowerCase().contains(_searchTerm) ||
-          expense.timeStamp.contains(_searchTerm);
+          expense.category.toLowerCase().contains(_searchTerm);
     }).toList();
   }
+
+  List<DiaryModel> filterDiary(
+      List<DiaryModel> expenses) {
+    return expenses.where((expense) {
+      return expense.classId.toLowerCase().contains(_searchTerm) ||
+          expense.subjectId.toLowerCase().contains(_searchTerm);
+    }).toList();
+  }
+
 
   bool filterTeachers(TeacherModel student) {
     return student.teacherCNIC.contains(_searchTerm) ||

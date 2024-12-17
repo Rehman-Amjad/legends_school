@@ -34,6 +34,7 @@ class RegistrationFormModel {
   String feePlan;
   String timestamp;
   String bForm;
+  String appPassword;
 
   RegistrationFormModel({
     required this.formId,
@@ -69,6 +70,7 @@ class RegistrationFormModel {
     required this.totalDues,
     required this.feePlan,
     required this.profileImage,
+    required this.appPassword,
   })  : this.admissionDate = admissionDate ?? DateFormat('dd/MMMM,yyyy').format(DateTime.now()),
         this.admissionTime = admissionTime ?? DateFormat('hh:mm a').format(DateTime.now());
 
@@ -107,6 +109,7 @@ class RegistrationFormModel {
       'feeStatus': feeStatus,
       'feePlan': feePlan,
       'bForm': bForm,
+      'appPassword': appPassword,
     };
   }
 
@@ -145,6 +148,7 @@ class RegistrationFormModel {
       feePlan: data['feePlan'] ?? '',
       timestamp: data['timestamp'] ?? '',
       bForm: data['bForm'] ?? '',
+      appPassword: data['appPassword'] ?? '',
     );
   }
 
@@ -182,6 +186,7 @@ class RegistrationFormModel {
     String? feePlan,
     String? timestamp,
     String? bForm,
+    String? appPassword,
   }) {
     return RegistrationFormModel(
       formId: formId ?? this.formId,
@@ -217,6 +222,7 @@ class RegistrationFormModel {
       feePlan: feePlan ?? this.feePlan,
       timestamp: timestamp ?? this.timestamp,
       bForm: bForm ?? this.bForm,
+      appPassword: appPassword ?? this.appPassword,
     );
   }
 }
